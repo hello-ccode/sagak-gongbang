@@ -200,6 +200,10 @@ button.who{border:0;background:none;font-weight:700}
 @media (max-width:700px){.roles{grid-template-columns:1fr}}
 .role{border:2px solid var(--line);background:#fff;border-radius:20px;padding:22px 14px;text-align:center}
 .role .em{font-size:3em}
+.rimg{display:block;width:120px;height:120px;object-fit:contain;margin:0 auto}
+.rimg.xs{display:inline-block;width:1.6em;height:1.6em;margin:0 2px;vertical-align:middle}
+.role-tag .rimg{display:inline-block;width:56px;height:56px;vertical-align:middle;margin-right:4px}
+.st-em .rimg{width:56px;height:56px}
 .role b{display:block;font-size:1.2em;margin:6px 0}
 .role span{color:var(--sub);font-size:.9em}
 .role-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -624,10 +628,12 @@ const QUIZ={
   ]},
 };
 const SELF=['😀 잘 알겠어요','🙂 조금 알겠어요','🤔 더 연습할래요'];
+const RI={read:'<img class="rimg xs" src="img/role_read.webp" alt="">',build:'<img class="rimg xs" src="img/role_build.webp" alt="">',check:'<img class="rimg xs" src="img/role_check.webp" alt="">'};
+const RB=k=>RI[k].replace('rimg xs','rimg');
 const ROLES=[
-  {k:'read',em:'📜',n:'주문서 담당',d:'주문을 읽고 조건을 찾아 친구들에게 알려 줘요'},
-  {k:'build',em:'✏️',n:'만들기 담당',d:'점판에 선을 긋거나 사각형을 만들어요'},
-  {k:'check',em:'🔍',n:'검사관',d:'삼각자로 검사하고, 이름과 이유를 골라 납품해요'},
+  {k:'read',em:RB('read'),n:'주문서 담당',d:'주문을 읽고 조건을 찾아 친구들에게 알려 줘요'},
+  {k:'build',em:RB('build'),n:'만들기 담당',d:'점판에 선을 긋거나 사각형을 만들어요'},
+  {k:'check',em:RB('check'),n:'검사관',d:'삼각자로 검사하고, 이름과 이유를 골라 납품해요'},
 ];
 
 /* ---------- 상태 ---------- */
@@ -842,9 +848,9 @@ function shopSteps(i){
   const P=ST.t.shop.prog[i]||{},o=ORDERS[i],who=d=>`${avc(d.me)}번`;
   const row=(k,em,title,todo,done)=>`<li class="step ${P[k]?'done':''}"><span class="st-em">${em}</span><div><b>${title}</b><div class="sub">${P[k]?done(P[k]):todo}</div></div><span class="st-ok">${P[k]?'✅':'⏳'}</span></li>`;
   return `<div class="card gap-top"><b>작업 순서</b> <span class="sub">${NET.on?'· 학생이 끝내면 여기에 바로 떠요':'· 연결이 안 되면 학생이 손을 들어 알려요'}</span><ol class="steps">
-  ${row('read','📜','1. 주문서 담당 · 조건 찾기','주문을 읽고 조건에 밑줄을 그어 만들기 담당에게 말해요',d=>`${who(d)} 조건을 찾았어요 · ${o.conds.map(k=>COND[k][1]).join(', ')}`)}
-  ${row('build','✏️','2. 만들기 담당 · 점판에 만들기','들은 조건대로 선을 긋거나 사각형을 만들어요',d=>`${who(d)} 다 만들었어요<span class="mini">${shapeFig(o,d.sh)}</span>`)}
-  ${row('deliver','🔍','3. 검사관 · 검사하고 납품','삼각자로 재어 보고 이름과 이유를 골라 납품해요',d=>`${who(d)} 📦 납품 · <b>${esc(d.name)}</b>`)}
+  ${row('read',RB('read'),'1. 주문서 담당 · 조건 찾기','주문을 읽고 조건에 밑줄을 그어 만들기 담당에게 말해요',d=>`${who(d)} 조건을 찾았어요 · ${o.conds.map(k=>COND[k][1]).join(', ')}`)}
+  ${row('build',RB('build'),'2. 만들기 담당 · 점판에 만들기','들은 조건대로 선을 긋거나 사각형을 만들어요',d=>`${who(d)} 다 만들었어요<span class="mini">${shapeFig(o,d.sh)}</span>`)}
+  ${row('deliver',RB('check'),'3. 검사관 · 검사하고 납품','삼각자로 재어 보고 이름과 이유를 골라 납품해요',d=>`${who(d)} 📦 납품 · <b>${esc(d.name)}</b>`)}
   </ol></div>`;
 }
 function tKids(){
@@ -896,9 +902,9 @@ function sShop(){
   if(!S.role)return `<main class="wrap"><h1>사각형 공방</h1><p class="lead">세 사람이 한 팀이 되어 손님의 주문을 해결해요. 1번 일부터 차례대로 이어서 해요. 내가 맡을 일을 골라요.</p>
   <div class="roles">${ROLES.map((r,i)=>`<button class="role" data-act="sRole" data-k="${r.k}"><span class="num">${i+1}</span><div class="em">${r.em}</div><b>${r.n}</b><span>${r.d}</span></button>`).join('')}</div></main>`;
   const r=ROLES.find(x=>x.k===S.role);
-  const todo={read:['주문을 읽고, 조건이 되는 말을 눌러 밑줄을 그어요.','조건을 모두 골라 확인을 눌러요.','✏️ 만들기 담당에게 조건을 또박또박 말해 줘요.'],
-    build:['📜 주문서 담당이 말해 준 조건을 눌러 적어 두어요.','점판에 선을 긋거나 사각형을 만들어요.','검사하기를 눌러요. 맞으면 🔍 검사관에게 넘어가요.'],
-    check:['✏️ 만들기 담당이 만든 그림을 삼각자로 재어 봐요.','질문에 답하고, 이름과 이유를 골라요.','📦 납품하기를 눌러요.']}[S.role];
+  const todo={read:['주문을 읽고, 조건이 되는 말을 눌러 밑줄을 그어요.','조건을 모두 골라 확인을 눌러요.',RI.build+' 만들기 담당에게 조건을 또박또박 말해 줘요.'],
+    build:[RI.read+' 주문서 담당이 말해 준 조건을 눌러 적어 두어요.','점판에 선을 긋거나 사각형을 만들어요.','검사하기를 눌러요. 맞으면 '+RI.check+' 검사관에게 넘어가요.'],
+    check:[RI.build+' 만들기 담당이 만든 그림을 삼각자로 재어 봐요.','질문에 답하고, 이름과 이유를 골라요.','📦 납품하기를 눌러요.']}[S.role];
   return `<main class="wrap"><div class="role-bar"><span class="role-tag">${r.em} ${r.n}</span><span class="prog">· 주문 ${S.i+1} ${custImg(ORDERS[S.i],'cust xs')}</span><button class="btn ghost sm" data-act="sRole" data-k="" style="margin-left:auto">역할 바꾸기</button></div>
   <div class="todo">내가 할 일<ol>${todo.map(t=>`<li>${t}</li>`).join('')}</ol></div>
   ${NET.on?'<p class="follow">🔗 주문 번호는 선생님 화면을 따라 바뀌어요.</p>':`<div class="row"><span class="prog">선생님 화면의 주문 번호를 눌러요</span><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="sShopGo" data-i="${i}">${i+1}</button>`).join('')}</div></div>`}
@@ -925,7 +931,7 @@ function sBuild(){
   board('build'+i,()=>makeBuildBoard(o));
   const guide={line:'점 두 개를 차례로 눌러 파란 선을 그어요.',quad:'동그라미 꼭짓점을 끌어서 사각형을 만들어요.',vip:"물음표(?) 변을 눌러 길이를 채워요. 그림의 한 칸은 1cm예요."}[o.type];
   return `<div class="grid2"><div class="card board-card" data-board="build${i}"></div>
-  <div><div class="qblock" style="margin-top:0"><h3>📜 주문서 담당이 말해 준 조건을 눌러 두세요</h3><div class="pool">${o.pool.map(k=>`<button class="pchip ${st.memo[k]?'sel':''}" data-act="bMemo" data-k="${k}"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</button>`).join('')}</div></div>
+  <div><div class="qblock" style="margin-top:0"><h3>${RI.read} 주문서 담당이 말해 준 조건을 눌러 두세요</h3><div class="pool">${o.pool.map(k=>`<button class="pchip ${st.memo[k]?'sel':''}" data-act="bMemo" data-k="${k}"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</button>`).join('')}</div></div>
   <p class="sub">${guide}</p>
   <div class="row">${o.type!=='vip'?'<button class="btn ghost" data-act="bReset">처음으로</button>':''}${o.hint?'<button class="btn ghost" data-act="bHint">💡 힌트</button>':''}<button class="btn" data-act="bCheck">검사하기</button></div>
   <div id="build-fb">${st.fb||''}</div></div></div>`;
@@ -949,11 +955,11 @@ function sCheck(){
     need=['eq'];
   }
   const sh=ST.s.shop.recv[ST.s.shop.i],made=!!sh||st.a.made==='네';
-  if(!NET.on)h=opt('made','✏️ 만들기 담당 화면에 «🎉 주문대로 만들었어요»가 나왔나요?',['네','아직이에요'])+h;
+  if(!NET.on)h=opt('made',RI.build+' 만들기 담당 화면에 «🎉 주문대로 만들었어요»가 나왔나요?',['네','아직이에요'])+h;
   const ready=made&&need.every(q=>st.a[q])&&(o.type!=='vip'||st.num);
-  h+=`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div>${made?'':'<p class="sub">✏️ 만들기 담당이 주문대로 다 만들어야 납품할 수 있어요.</p>'}<div id="check-fb">${st.fb||''}</div>`;
+  h+=`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div>${made?'':'<p class="sub">'+RI.build+' 만들기 담당이 주문대로 다 만들어야 납품할 수 있어요.</p>'}<div id="check-fb">${st.fb||''}</div>`;
   if(!NET.on)return h;
-  return `<div class="grid2"><div>${sh?`<div class="card board-card">${shapeFig(o,sh)}<div class="cap">✏️ 만들기 담당이 보낸 그림</div></div>`
+  return `<div class="grid2"><div>${sh?`<div class="card board-card">${shapeFig(o,sh)}<div class="cap">${RI.build} 만들기 담당이 보낸 그림</div></div>`
     :`<div class="wait">⏳ 만들기 담당이 아직 그림을 보내지 않았어요.<br>다 만들어서 검사하기를 누르면 여기에 그림이 나타나요.<br>친구 화면을 보고 먼저 답을 골라도 돼요.</div>${st.a.made==='네'?'<p class="sub">✅ 만들기 담당 화면에서 직접 확인했어요.</p>':'<div class="row"><button class="btn ghost sm" data-act="cOpt" data-q="made" data-v="네">그림이 안 와요 · 친구 화면에서 🎉를 직접 봤어요</button></div>'}`}</div><div>${h}</div></div>`;
 }
 function sQuiz(){
