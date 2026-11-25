@@ -63,23 +63,29 @@ body.home{min-height:100vh;display:flex;align-items:center;justify-content:cente
 .kicker{color:var(--acc);font-weight:800}
 .home-card h1{font-size:3em;margin:.15em 0}
 .home-btns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
-.big{display:block;text-decoration:none;background:#fff;border:2px solid var(--ink);border-radius:22px;padding:28px 18px;font-size:1.4em;font-weight:800}
-.big small{display:block;font-size:.6em;color:var(--sub);font-weight:600;margin-top:6px}
+.hbig{display:block;text-decoration:none;background:#fff;border:2px solid var(--ink);border-radius:22px;padding:28px 18px;font-size:1.4em;font-weight:800}
+.hbig small{display:block;font-size:.6em;color:var(--sub);font-weight:600;margin-top:6px}
 /* twenty */
-.cands{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:12px 0 20px}
-@media (max-width:900px){.cands{grid-template-columns:repeat(3,1fr)}}
-.cand{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px;text-align:center;transition:all .6s}
+.cands{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin:12px 0 18px}
+@media (max-width:1100px){.cands{grid-template-columns:repeat(4,1fr)}}
+.cand{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px;text-align:center;transition:all .6s}
+.cand:disabled{opacity:1;cursor:default}
 .cand-svg{width:100%;display:block}
 .cand-svg *{fill:var(--acc-soft);stroke:var(--acc);stroke-width:3;stroke-linejoin:round}
-.cand-l{font-weight:800;margin-top:6px}
+.cand-l{font-weight:800;margin-top:6px;font-size:.9em;white-space:nowrap}
 .cand.out{opacity:.22;transform:scale(.9);filter:grayscale(1)}
 .cand.out::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4em;color:var(--no);font-weight:900}
-.cand.win{border-color:var(--acc);box-shadow:0 0 0 6px var(--acc-soft);transform:scale(1.05)}
-.tqs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.tq{border:2px solid var(--ink);background:#fff;border-radius:18px;padding:16px;font-size:1.12em;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px}
+.cand.win{border-color:var(--acc);box-shadow:0 0 0 6px var(--acc-soft);transform:scale(1.06)}
+.cand.back{display:flex;align-items:center;justify-content:center;aspect-ratio:1/1.2;font-size:2.6em;font-weight:900;color:var(--acc);background:var(--acc-soft);border-style:dashed}
+.tqs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){.tqs{grid-template-columns:repeat(2,1fr)}}
+.tq{border:2px solid var(--ink);background:#fff;border-radius:18px;padding:12px;font-size:1.05em;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:96px}
+.tq small{font-size:.72em;font-weight:700;color:var(--sub)}
 .tq.used{background:var(--ink);color:#fff}
+.tq.used small{color:#b9bcc2}
 .tq:disabled:not(.used){opacity:.35}
 .tq-a{font-size:.95em;color:#ffd166}
+.tq-a.no{color:#ffa3a3}
 .tw-status{text-align:center;font-size:1.3em;font-weight:800;margin:18px 0 4px}
 .secret{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:26px;align-items:center;margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
 @media (max-width:900px){.secret{grid-template-columns:1fr}}
@@ -107,6 +113,52 @@ b.red{color:var(--perp)} b.blue{color:var(--par1)}
 .chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px}
 .chain .c{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:7px 16px;font-weight:800}
 .chain .arr{color:var(--sub);font-size:.85em;font-weight:700}
+.chain .new{animation:pop .5s both}
+.concl{font-weight:800;font-size:1.08em;margin:14px 2px 4px;animation:pop .5s both}
+/* 선생님 아래쪽 단추 줄 */
+.tbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tbar-mid{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-width:0}
+body.teacher .wrap{padding-bottom:120px}
+body.teacher .board-card .board{max-height:calc(100vh - 260px)}
+.net{font-size:.78em;font-weight:700;color:var(--sub);white-space:nowrap}
+.net.on{color:var(--ok)}
+.kdots{font-size:1.15em;letter-spacing:2px}
+.ndot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#c9c3b6;margin-left:6px;vertical-align:1px}
+.ndot.on{background:var(--ok)}
+button.who{border:0;background:none;font-weight:700}
+#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-160%);transition:transform .35s;z-index:50;background:var(--ink);color:#fff;border-radius:20px;padding:16px 26px;font-weight:800;font-size:1.15em;line-height:1.5;box-shadow:0 12px 34px rgba(0,0,0,.28);width:max-content;max-width:min(92vw,820px);text-align:center;cursor:pointer}
+#toast.on{transform:translate(-50%,0)}
+/* 공방 작업 순서 */
+.steps{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.step{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:9px 12px}
+.step.done{border-color:#bfe6d4;background:#f1faf6}
+.st-em{font-size:1.6em;flex:none}
+.step>div{flex:1;min-width:0}
+.step .sub{margin:2px 0 0}
+.st-ok{font-size:1.2em;flex:none}
+.mini{display:block;width:140px;margin-top:4px}
+.mini svg{width:100%;display:block;background:#fff;border-radius:8px}
+.sbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.sbox .stars{flex:1;min-width:120px}
+/* 학생 현황 */
+.kids{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:800px){.kids{grid-template-columns:1fr}}
+.kid.off{opacity:.55}
+.kid-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.kid-em{font-size:2.4em}
+.kid-h .sub{margin:0 0 0 auto;text-align:right;font-size:.8em}
+.kid-l{list-style:none;margin:0;padding:0}
+.kid-l li{padding:9px 4px;border-top:1px solid var(--line)}
+.kid-l li b{float:right}
+.self{color:var(--acc);font-weight:700;margin-top:2px}
+.stc{color:#f2a900}
+/* 학생 공방 */
+.role .num{display:inline-block;background:var(--ink);color:#fff;border-radius:999px;width:1.8em;height:1.8em;line-height:1.8em;font-weight:800}
+.todo{background:#fff8ec;border:1.5px solid #f3d6a2;border-radius:14px;padding:10px 16px;margin:10px 0;font-weight:600}
+.todo ol{margin:2px 0 0;padding-left:1.4em}
+.follow{font-weight:800;color:var(--acc)}
+.cap{text-align:center;font-weight:800;color:var(--sub);margin:4px 0 2px}
+.wait{border:2px dashed var(--line);border-radius:16px;padding:18px;text-align:center;color:var(--sub);font-weight:700}
 /* shop */
 .shop{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:900px){.shop{grid-template-columns:1fr}}
@@ -120,6 +172,7 @@ b.red{color:var(--perp)} b.blue{color:var(--par1)}
 .onum{display:flex;gap:8px;flex-wrap:wrap}
 .onum button{width:54px;height:54px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:1.1em}
 .onum button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.onum button:disabled{opacity:.35}
 .stars{font-size:1.6em;min-height:1.6em;letter-spacing:2px}
 .timer{font-size:2em;font-weight:800;font-variant-numeric:tabular-nums;min-width:3.2em}
 .stars .sub{font-size:.55em;letter-spacing:0}
@@ -226,6 +279,43 @@ function speak(t){
     const txt=t.replace(/\(\s*\)/g,'빈칸').replace(/cm²/g,'제곱센티미터').replace(/cm/g,'센티미터').replace(/(\d)m/g,'$1미터').replace(/×/g,'곱하기');
     const u=new SpeechSynthesisUtterance(txt);u.lang='ko-KR';u.rate=.9;s.speak(u);}catch(_){}
 }
+function toast(h,ms){
+  let el=document.getElementById('toast');
+  if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el);el.addEventListener('click',()=>el.classList.remove('on'));}
+  el.innerHTML=h;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),ms||7000);
+}
+
+/* ---------- 선생님·학생 화면 연동 (ntfy.sh 무료 알림 서비스) ----------
+   이름 없이 번호(1·2·3번)와 활동 결과만 주고받는다. 연결이 안 되면 각 화면이 따로 동작한다. */
+const ROOM=((new URLSearchParams(location.search).get('room')||'main').replace(/[^\w-]/g,'').slice(0,20))||'main';
+const NET={on:false,es:null,me:Math.random().toString(36).slice(2,10),topic:'sgb-k4n8w2r7x5qa-'+ROOM};
+function netStart(){
+  if(NET.es||!window.EventSource||!window.fetch)return;
+  let es;try{es=new EventSource('https://ntfy.sh/'+NET.topic+'/sse');}catch(_){return;}
+  NET.es=es;
+  es.onopen=()=>{if(!NET.on){NET.on=true;netChanged();}};
+  es.onerror=()=>{if(NET.on){NET.on=false;netChanged();}if(es.readyState===2){NET.es=null;setTimeout(netStart,5000);}};
+  es.onmessage=e=>{let m,d;try{m=JSON.parse(e.data);}catch(_){return;}
+    if(!m||m.event!=='message'||typeof m.message!=='string')return;
+    try{d=JSON.parse(m.message);}catch(_){return;}
+    if(!d||typeof d!=='object'||d.from===NET.me)return;
+    try{onNet(d);}catch(_){}};
+}
+function send(d){
+  if(!NET.on)return;d.from=NET.me;
+  try{fetch('https://ntfy.sh/'+NET.topic,{method:'POST',body:JSON.stringify(d)}).catch(()=>{});}catch(_){}
+}
+function netChanged(){
+  if(NET.on){
+    if(location.hash==='#t'){send({t:'who'});send({t:'order',i:ST.t.shop.i});}
+    else if(location.hash==='#s')sendSnap(true);
+  }
+  softRender();
+}
+const AV={1:'🐯',2:'🐰',3:'🐻'};
+const STABS=['lines','morph','shop','quiz'];
+const okI=(n,max)=>Number.isInteger(n)&&n>=0&&n<max;
+const okXY=p=>p&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=0&&p.x<11&&p.y>=0&&p.y<8;
 
 /* ---------- 사각형 판별 ---------- */
 function orient(a,b,c){return Math.sign(cross(sub(b,a),sub(c,a)));}
@@ -404,20 +494,26 @@ const PRESET={
   '마름모':pts([[2,4],[5,2],[8,4],[5,6]]),
 };
 const CANDS=[
-  {label:'삼각형',svg:'<polygon points="50,12 92,84 8,84"/>',p:{four:false,right:false,eq:true}},
-  {label:'원',svg:'<circle cx="50" cy="50" r="38"/>',p:{four:false,right:false,eq:false}},
-  {label:'오각형',svg:'<polygon points="50,8 90,37 75,85 25,85 10,37"/>',p:{four:false,right:false,eq:true}},
-  {label:'직사각형',svg:'<polygon points="6,26 94,26 94,74 6,74"/>',p:{four:true,right:true,eq:false}},
-  {label:'정사각형',svg:'<polygon points="16,16 84,16 84,84 16,84"/>',p:{four:true,right:true,eq:true},secret:true},
-  {label:'???',svg:'<polygon points="50,5 80,50 50,95 20,50"/>',p:{four:true,right:false,eq:true}},
+  {label:'원',svg:'<circle cx="50" cy="50" r="40"/>',p:{curve:1}},
+  {label:'삼각형',svg:'<polygon points="50,10 95,88 5,88"/>',p:{s3:1,eq:1}},
+  {label:'직각삼각형',svg:'<polygon points="12,12 12,88 88,88"/>',p:{s3:1,right:1}},
+  {label:'오각형',svg:'<polygon points="50,8 90,37 75,85 25,85 10,37"/>',p:{s5:1,eq:1}},
+  {label:'직사각형',svg:'<polygon points="4,24 96,24 96,76 4,76"/>',p:{s4:1,right:1,allRight:1,par:1}},
+  {label:'정사각형',svg:'<polygon points="14,14 86,14 86,86 14,86"/>',p:{s4:1,right:1,allRight:1,eq:1,par:1},secret:true},
+  {label:'평행사변형',svg:'<polygon points="2,76 70,76 98,24 30,24"/>',p:{s4:1,par:1}},
+  {label:'???',svg:'<polygon points="50,4 82,50 50,96 18,50"/>',p:{s4:1,eq:1,par:1}},
 ];
-const TQ=[{k:'four',q:'변이 4개야?'},{k:'right',q:'모든 각이 직각이야?'},{k:'eq',q:'모든 변의 길이가 같아?'}];
+const TQ=[
+  {k:'curve',q:'굽은 선이 있나요?'},{k:'s3',q:'변이 3개인가요?'},{k:'s4',q:'변이 4개인가요?'},{k:'s5',q:'변이 5개인가요?'},
+  {k:'right',q:'직각이 있나요?'},{k:'allRight',q:'모든 각이 직각인가요?'},{k:'eq',q:'모든 변의 길이가 같나요?'},{k:'par',q:'평행한 변이 있나요?'},
+];
 const TABLE=[
   {n:'정사각형',P:PRESET['정사각형'],c:['2쌍','네 변이 모두 같아요','네 각이 모두 직각'],start:true},
-  {n:'사다리꼴',P:PRESET['사다리꼴'],c:['한 쌍이라도 있으면 돼요','같지 않아도 돼요','없어도 돼요']},
-  {n:'평행사변형',P:PRESET['평행사변형'],c:['2쌍','마주 보는 변끼리 같아요','없어도 돼요']},
   {n:'마름모',P:PRESET['마름모'],c:['2쌍','네 변이 모두 같아요','없어도 돼요']},
+  {n:'평행사변형',P:PRESET['평행사변형'],c:['2쌍','마주 보는 변끼리 같아요','없어도 돼요']},
+  {n:'사다리꼴',P:PRESET['사다리꼴'],c:['한 쌍이라도 있으면 돼요','같지 않아도 돼요','없어도 돼요']},
 ];
+const CHAIN=[['정사각형',''],['마름모',"'직각' 조건 빼기"],['평행사변형',"'네 변 같음' 조건 빼기"],['사다리꼴','평행은 한 쌍만 남기기']];
 const COND={
   perp:['⊥','수직인 선(수선)'],para:['∥','평행한 선(평행선)'],
   par1:['∥ 1쌍','평행한 변이 딱 한 쌍'],par2:['∥ 2쌍','평행한 변이 두 쌍'],
@@ -493,14 +589,77 @@ const ROLES=[
 ];
 
 /* ---------- 상태 ---------- */
+const newTw=()=>({asked:[],guessed:[],won:false,reveal:false,hide:false,msg:''});
+let savedMe=null;try{savedMe=localStorage.getItem('sagak-me');}catch(_){}
 const ST={
-  t:{tab:'twenty',tw:{asked:[],reveal:false},demo:{marks:true,name:false},table:{rev:{}},shop:{i:0,reveal:false,stars:0,tLeft:120,tEnd:0,run:false}},
-  s:{tab:'lines',lines:{i:0,fb:'',done:{}},morph:{i:0,fb:'',done:{},marks:true},shop:{role:null,i:0,st:{}},quiz:{lv:null}},
+  t:{tab:'twenty',tw:newTw(),demo:{marks:true,name:false},table:{rev:{},step:0},shop:{i:0,reveal:false,stars:0,tLeft:120,tEnd:0,run:false,prog:{}},kids:{}},
+  s:{me:AV[savedMe]?savedMe:null,tab:'lines',lines:{i:0,fb:'',done:{}},morph:{i:0,fb:'',done:{},marks:true},shop:{role:null,i:0,st:{},recv:{}},quiz:{lv:null},qres:{}},
 };
 function sst(role){const S=ST.s.shop,k=role+S.i;return S.st[k]||(S.st[k]={});}
+function busy(){return Object.values(BOARDS).some(b=>b.drag!=null);}
+let rT=0;
+function softRender(){clearTimeout(rT);if(busy()){rT=setTimeout(softRender,300);return;}render();}
+
+/* ---------- 연동: 학생 → 선생님 ---------- */
+let snapT=0;
+function sendSnap(hello){
+  const S=ST.s;if(!S.me||location.hash!=='#s')return;
+  clearTimeout(snapT);
+  snapT=setTimeout(()=>{send({t:'snap',me:S.me,hello:hello?1:0,tab:S.tab,lines:Object.keys(S.lines.done).map(Number),morph:Object.keys(S.morph.done).map(Number),quiz:S.qres});},hello?50:700);
+}
+function shapeOf(o,b){
+  if(o.type==='quad')return{P:b.P.map(p=>[p.x,p.y])};
+  if(o.type==='line')return{ua:b.ua,ub:b.ub};
+  return{labels:b.labels.slice()};
+}
+function cleanShape(o,d){
+  if(o.type==='quad'){const P=Array.isArray(d.P)&&d.P.length===4?pts(d.P):null;return P&&P.every(okXY)?{P}:null;}
+  if(o.type==='line')return okXY(d.ua)&&okXY(d.ub)?{ua:{x:d.ua.x,y:d.ua.y},ub:{x:d.ub.x,y:d.ub.y}}:null;
+  return Array.isArray(d.labels)&&d.labels.length===4?{labels:d.labels.map(v=>v?'5cm':'')}:null;
+}
+function shapeFig(o,sh){
+  if(o.type==='quad')return figSVG(sh.P,{box:[-.6,-.6,11.2,8.2]});
+  if(o.type==='line')return figLinesSVG(o.given,{a:sh.ua,b:sh.ub},{cols:11,rows:8});
+  return figSVG(VIP_P,{labels:sh.labels,grid:false,pad:1.2});
+}
+function onNet(d){
+  const r=location.hash;
+  if(r==='#t'){
+    const T=ST.t;
+    if(d.t==='snap'&&AV[d.me]){
+      const q={};[1,2,3].forEach(l=>{const x=d.quiz&&d.quiz[l];if(x&&Number.isInteger(x.n))q[l]={n:Math.max(0,Math.min(x.n,QUIZ[l].qs.length)),of:QUIZ[l].qs.length,self:SELF.includes(x.self)?x.self:null};});
+      const arr=(a,max)=>Array.isArray(a)?a.filter(n=>okI(n,max)):[];
+      T.kids[d.me]={tab:STABS.includes(d.tab)?d.tab:'',lines:arr(d.lines,LINE_M.length),morph:arr(d.morph,MORPH_M.length),quiz:q};
+      if(d.hello)send({t:'order',i:T.shop.i});
+      setHTML('tbar-kids',kidDots());
+      if(T.tab==='kids')softRender();
+    }
+    if(d.t==='shop'&&okI(d.i,ORDERS.length)&&AV[d.me]){
+      const o=ORDERS[d.i],P=T.shop.prog[d.i]||(T.shop.prog[d.i]={}),tag=`${AV[d.me]} ${d.me}번`;
+      if(d.step==='read'&&!P.read){P.read={me:d.me};}
+      else if(d.step==='build'){const sh=cleanShape(o,d);if(!sh)return;P.build={me:d.me,sh};if(!P.deliver)ding('ok');}
+      else if(d.step==='deliver'&&!P.deliver){
+        const name=o.type==='quad'?(o.ins.accept.includes(d.name)?d.name:o.ins.name):o.answer.name;
+        P.deliver={me:d.me,name};T.shop.stars++;ding('bell');
+        toast(`📦 납품 도착! 주문 ${d.i+1} · ${o.who} ${o.name}<br>${tag} 검사관: <b>${esc(name)}</b> · ⭐ 하나 받았어요`,8000);
+      }else return;
+      if(T.tab==='shop')softRender();
+    }
+  }else if(r==='#s'){
+    const S=ST.s;
+    if(d.t==='order'&&okI(d.i,ORDERS.length)){if(S.shop.i!==d.i){S.shop.i=d.i;if(S.tab==='shop')softRender();}}
+    else if(d.t==='go'&&STABS.includes(d.tab)){S.tab=d.tab;ding('bell');softRender();scrollTo(0,0);sendSnap();}
+    else if(d.t==='who')sendSnap();
+    else if(d.t==='shop'&&d.step==='build'&&okI(d.i,ORDERS.length)){
+      const sh=cleanShape(ORDERS[d.i],d);if(!sh)return;S.shop.recv[d.i]=sh;
+      if(S.tab==='shop'&&S.shop.role==='check'&&S.shop.i===d.i){ding('ok');softRender();}
+    }
+  }
+}
 
 /* ---------- 공통 조각 ---------- */
-const topbar=(who,tabs,cur)=>`<header class="top"><a class="brand" href="#">◇ 사각형 공방</a><nav class="tabs">${tabs.map(([k,l])=>`<button class="tab ${k===cur?'on':''}" data-act="tab" data-who="${who}" data-k="${k}">${l}</button>`).join('')}</nav><span class="who">${who==='t'?'🖥️ 선생님':'📱 학생'}</span></header>`;
+const ndot=()=>`<i class="ndot ${NET.on?'on':''}" title="${NET.on?'연결됨':'연결 안 됨'}"></i>`;
+const topbar=(who,tabs,cur)=>`<header class="top"><a class="brand" href="#">◇ 사각형 공방</a><nav class="tabs">${tabs.map(([k,l])=>`<button class="tab ${k===cur?'on':''}" data-act="tab" data-who="${who}" data-k="${k}">${l}</button>`).join('')}</nav>${who==='t'?`<span class="who">🖥️ 선생님${ndot()}</span>`:`<button class="who" data-act="sMe">${ST.s.me?`${AV[ST.s.me]} ${ST.s.me}번`:'📱 학생'}${ndot()}</button>`}</header>`;
 const sayBtn=t=>`<button class="say" data-act="say" data-t="${esc(t)}" aria-label="읽어 주기">🔊</button>`;
 const legendHTML=()=>`<div class="legend"><span><i class="lg r"></i>직각(수직)</span><span><i class="lg b"></i>평행한 변</span><span><i class="lg o"></i>길이가 같은 변</span></div>`;
 const condChip=k=>`<span class="chip"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</span>`;
@@ -523,23 +682,37 @@ function lineFeedback(kind,target){
 /* ---------- 첫 화면 ---------- */
 function homeView(){
   return `<div class="home-card"><div class="kicker">중학교 특수학급 · 수학</div><h1>사각형 공방</h1><p class="lead">수직과 평행으로 여러 가지 사각형의 특징을 찾아요</p>
-  <div class="home-btns"><a class="big" href="#t">🖥️ 선생님 화면<small>교실 화면에 띄워요</small></a><a class="big" href="#s">📱 학생 화면<small>아이패드에서 열어요</small></a></div></div>`;
+  <div class="home-btns"><a class="hbig" href="#t">🖥️ 선생님 화면<small>교실 화면에 띄워요</small></a><a class="hbig" href="#s">📱 학생 화면<small>아이패드에서 열어요</small></a></div></div>`;
 }
 
 /* ---------- 선생님 화면 ---------- */
+const TTABS=[['twenty','① 비밀 도형'],['demo','② 변신 사각형'],['table','③ 특징 표'],['shop','④ 사각형 공방'],['kids','⑤ 확인 문제']];
+const SNAME={lines:'① 수직·평행',morph:'② 변신 사각형',shop:'③ 사각형 공방',quiz:'④ 확인 문제'};
+const SEND={demo:['lines','morph'],shop:['shop'],kids:['quiz']};
 function teacherView(){
-  const T=ST.t,tabs=[['twenty','① 비밀 사각형'],['demo','② 변신 사각형'],['table','③ 특징 표'],['shop','④ 사각형 공방']];
-  return topbar('t',tabs,T.tab)+({twenty:tTwenty,demo:tDemo,table:tTable,shop:tShop}[T.tab])();
+  const T=ST.t;
+  return topbar('t',TTABS,T.tab)+({twenty:tTwenty,demo:tDemo,table:tTable,shop:tShop,kids:tKids}[T.tab])()+tbar();
+}
+const kidDots=()=>{const ks=[1,2,3].filter(n=>ST.t.kids[n]);return ks.length?`<span class="kdots" title="연결된 학생">📱${ks.map(n=>AV[n]).join('')}</span>`:'';};
+function tbar(){
+  const T=ST.t,idx=TTABS.findIndex(x=>x[0]===T.tab);
+  const send=(SEND[T.tab]||[]).map(k=>`<button class="btn ghost sm" data-act="tSend" data-k="${k}" ${NET.on?'':'disabled'}>📱 학생 화면 → ${SNAME[k]}</button>`).join('');
+  return `<nav class="tbar">${T.tab!=='kids'?'<button class="btn ghost" data-act="tReset">⟲ 처음부터</button>':''}
+  <div class="tbar-mid">${send}<span id="tbar-kids">${kidDots()}</span><span class="net ${NET.on?'on':''}">${NET.on?'● 학생 화면과 연결됨':'○ 연결 안 됨'}</span></div>
+  <button class="btn ghost" data-act="tMove" data-d="-1" ${idx<=0?'disabled':''}>◀ 이전</button><button class="btn acc" data-act="tMove" data-d="1" ${idx>=TTABS.length-1?'disabled':''}>다음으로 ▶</button></nav>`;
 }
 function tTwenty(){
-  const S=ST.t.tw,secret=CANDS.find(c=>c.secret);
-  const out=c=>S.asked.some(k=>c.p[k]!==secret.p[k]);
-  const remain=CANDS.filter(c=>!out(c)),done=remain.length===1;
-  return `<main class="wrap"><h1>비밀 도형을 찾아라!</h1><p class="lead">선생님 마음속 비밀 도형은 무엇일까요? 질문 카드를 골라 물어보세요. <b>질문은 3번까지!</b></p>
-  <div class="cands">${CANDS.map(c=>`<div class="cand ${out(c)?'out':''} ${done&&!out(c)?'win':''}"><svg viewBox="0 0 100 100" class="cand-svg">${c.svg}</svg><div class="cand-l">${c.label}</div></div>`).join('')}</div>
-  <div class="tqs">${TQ.map(q=>{const used=S.asked.includes(q.k);return `<button class="tq ${used?'used':''}" data-act="twAsk" data-k="${q.k}" ${used||done?'disabled':''}><span>${q.q}</span>${used?'<span class="tq-a">네!</span>':''}</button>`;}).join('')}</div>
-  <div class="tw-status">${done?'🎉 비밀 도형은 <b>정사각형</b>이에요!':`남은 도형 ${remain.length}개 · 질문 ${S.asked.length}번`}</div>
-  <div class="row center">${done&&!S.reveal?'<button class="btn acc big" data-act="twReveal">정사각형의 비밀 보기 →</button>':''}<button class="btn ghost" data-act="twReset">처음부터</button></div>
+  const S=ST.t.tw,sec=CANDS.find(c=>c.secret);
+  const out=(c,i)=>S.guessed.includes(i)||S.asked.some(k=>!!c.p[k]!==!!sec.p[k]);
+  const remain=CANDS.filter((c,i)=>!out(c,i)).length;
+  const cands=S.hide&&!S.won?CANDS.map(()=>'<div class="cand back">?</div>').join('')
+    :CANDS.map((c,i)=>{const o=out(c,i);return `<button class="cand ${o?'out':''} ${S.won&&c.secret?'win':''}" data-act="twGuess" data-i="${i}" ${o||S.won?'disabled':''}><svg viewBox="0 0 100 100" class="cand-svg">${c.svg}</svg><div class="cand-l">${c.label}</div></button>`;}).join('');
+  const status=S.won?'🎉 정답! 비밀 도형은 <b>정사각형</b>이에요!':(S.msg?S.msg+' · ':'')+`질문 ${S.asked.length}번 · 남은 도형 ${S.hide?'?':remain}개`;
+  return `<main class="wrap"><h1>비밀 도형을 찾아라!</h1><p class="lead">선생님 마음속에 도형이 하나 있어요. 질문 카드를 골라 선생님께 물어보세요. 선생님은 "네", "아니요"로만 대답해요. 답을 알 것 같으면 "○○인가요?" 하고 물어보세요.</p>
+  <div class="cands">${cands}</div>
+  <div class="tqs">${TQ.map(q=>{const used=S.asked.includes(q.k),yes=!!sec.p[q.k];return `<button class="tq ${used?'used':''}" data-act="twAsk" data-k="${q.k}" ${used||S.won?'disabled':''}><small>선생님,</small><span>${q.q}</span>${used?`<span class="tq-a ${yes?'':'no'}">${yes?'네! ⭕':'아니요! ✕'}</span>`:''}</button>`;}).join('')}</div>
+  <div class="tw-status">${status}</div>
+  <div class="row center">${S.won&&!S.reveal?'<button class="btn acc big" data-act="twReveal">정사각형의 비밀 보기 →</button>':''}${S.won?'':`<button class="btn ghost" data-act="twHide">${S.hide?'👀 보기 보이기':'🙈 보기 가리기'}</button>`}</div>
   ${S.reveal?secretPanel():''}</main>`;
 }
 function secretPanel(){
@@ -561,24 +734,44 @@ function tDemo(){
   <div id="tdemo-info">${infoHTML(b,D.name)}</div>${legendHTML()}</div></div></main>`;
 }
 function tTable(){
-  const R=ST.t.table.rev;
+  const R=ST.t.table.rev,st=ST.t.table.step||0;
   return `<main class="wrap"><h1>사각형 특징 표</h1><p class="lead">칸을 누르면 답이 보여요. 정사각형에서 조건을 하나씩 빼 보세요.</p>
   <table class="ftable"><thead><tr><th>사각형</th><th>평행한 변</th><th>변의 길이</th><th>직각</th></tr></thead><tbody>
   ${TABLE.map((r,i)=>`<tr class="${r.start?'start':''}"><td><div class="nm-in">${figSVG(r.P,{marks:true,grid:false,pad:.5})}<span>${r.n}${r.start?'<small>출발</small>':''}</span></div></td>${r.c.map((c,j)=>{const on=r.start||R[i+'-'+j];return `<td><button class="cell ${on?'rev':''}" data-act="tblCell" data-k="${i}-${j}" ${r.start?'disabled':''}>${on?c:'?'}</button></td>`;}).join('')}</tr>`).join('')}
   </tbody></table>
-  <div class="row"><button class="btn ghost" data-act="tblAll">모두 보기</button><button class="btn ghost" data-act="tblHide">모두 가리기</button></div>
-  <div class="chain"><span class="c">정사각형</span><span class="arr">'직각' 조건 빼기 →</span><span class="c">마름모</span><span class="arr">'네 변 같음' 조건 빼기 →</span><span class="c">평행사변형</span><span class="arr">평행은 한 쌍만 남기기 →</span><span class="c">사다리꼴</span></div>
-  <p class="sub">그래서 정사각형은 마름모이기도, 평행사변형이기도, 사다리꼴이기도 해요.</p>${legendHTML()}</main>`;
+  <div class="row"><button class="btn ghost" data-act="tblAll">표 모두 보기</button><button class="btn ghost" data-act="tblHide">표 모두 가리기</button>
+  <button class="btn acc" data-act="tblStep" ${st>=4?'disabled':''}>${st===0?'▶ 설명 보기':`▶ 다음 설명 (${st}/4)`}</button>${st?'<button class="btn ghost" data-act="tblStepHide">설명 가리기</button>':''}</div>
+  ${st?`<div class="chain"><span class="c">정사각형</span>${CHAIN.slice(1,Math.min(st,3)+1).map((c,k)=>`<span class="arr ${k+1===st?'new':''}">${c[1]} →</span><span class="c ${k+1===st?'new':''}">${c[0]}</span>`).join('')}</div>`:''}
+  ${st>=4?'<p class="concl">그래서 정사각형은 마름모이기도, 평행사변형이기도, 사다리꼴이기도 해요.</p>':''}${legendHTML()}</main>`;
 }
 function tShop(){
   const S=ST.t.shop,o=ORDERS[S.i];
   return `<main class="wrap"><div class="shop">
-  <section><div class="card order"><div class="who-em">${o.who}</div><div class="who-name">주문 ${S.i+1} / ${ORDERS.length} · ${o.name}</div><div class="bubble">${o.text}</div></div>${S.reveal?answerHTML(o):''}</section>
-  <section><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="tShopGo" data-i="${i}">${i+1}</button>`).join('')}</div>
-  <div class="row"><button class="btn ghost" data-act="say" data-t="${esc(o.text)}">🔊 주문 읽기</button><button class="btn ghost" data-act="tBell">🔔 손님 왔어요</button></div>
-  <div class="card"><div class="row" style="margin:0"><span class="timer" id="tTimer">${fmt(S.tLeft)}</span><button class="btn ghost" data-act="tTimer">${S.run?'멈춤':'시작'}</button><button class="btn ghost" data-act="tTimerReset">2분으로</button></div></div>
-  <div class="card" style="margin-top:12px"><b>우리 팀 별</b><div class="stars">${'⭐'.repeat(S.stars)||'<span class="sub">아직 없어요</span>'}</div><div class="row" style="margin:6px 0 0"><button class="btn" data-act="tStar" data-d="1">⭐ 주기</button><button class="btn ghost" data-act="tStar" data-d="-1">빼기</button></div></div>
-  <div class="row"><button class="btn acc big" data-act="tReveal">${S.reveal?'정답 숨기기':'정답 공개'}</button></div></section></div></main>`;
+  <section><div class="card order"><div class="who-em">${o.who}</div><div class="who-name">주문 ${S.i+1} / ${ORDERS.length} · ${o.name}</div><div class="bubble">${o.text}</div></div>${S.reveal?answerHTML(o):''}${timerStars()}</section>
+  <section><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="tShopGo" data-i="${i}">${i+1}</button>`).join('')}<button data-act="tShopGo" data-i="${S.i+1}" ${S.i+1<ORDERS.length?'':'disabled'} style="width:auto;padding:0 14px">다음 주문 ▶</button></div>
+  <div class="row"><button class="btn ghost" data-act="say" data-t="${esc(o.text)}">🔊 주문 읽기</button><button class="btn ghost" data-act="tBell">🔔 손님 왔어요</button><button class="btn acc" data-act="tReveal">${S.reveal?'정답 숨기기':'정답 공개'}</button></div>
+  ${shopSteps(S.i)}</section></div></main>`;
+}
+function timerStars(){
+  const S=ST.t.shop;
+  return `<div class="card gap-top"><div class="sbox"><span class="timer" id="tTimer">${fmt(S.tLeft)}</span><button class="btn ghost sm" data-act="tTimer">${S.run?'멈춤':'시작'}</button><button class="btn ghost sm" data-act="tTimerReset">2분으로</button></div>
+  <div class="sbox" style="margin-top:8px"><div class="stars">${'⭐'.repeat(S.stars)||'<span class="sub">우리 팀 별 · 아직 없어요</span>'}</div><button class="btn sm" data-act="tStar" data-d="1">⭐ 주기</button><button class="btn ghost sm" data-act="tStar" data-d="-1">빼기</button></div></div>`;
+}
+function shopSteps(i){
+  const P=ST.t.shop.prog[i]||{},o=ORDERS[i],who=d=>`${AV[d.me]} ${d.me}번`;
+  const row=(k,em,title,todo,done)=>`<li class="step ${P[k]?'done':''}"><span class="st-em">${em}</span><div><b>${title}</b><div class="sub">${P[k]?done(P[k]):todo}</div></div><span class="st-ok">${P[k]?'✅':'⏳'}</span></li>`;
+  return `<div class="card gap-top"><b>작업 순서</b> <span class="sub">${NET.on?'· 학생이 끝내면 여기에 바로 떠요':'· 연결이 안 되면 학생이 손을 들어 알려요'}</span><ol class="steps">
+  ${row('read','📜','1. 주문서 담당 · 조건 찾기','주문을 읽고 조건에 밑줄을 그어 만들기 담당에게 말해요',d=>`${who(d)} 조건을 찾았어요 · ${o.conds.map(k=>COND[k][1]).join(', ')}`)}
+  ${row('build','✏️','2. 만들기 담당 · 점판에 만들기','들은 조건대로 선을 긋거나 사각형을 만들어요',d=>`${who(d)} 다 만들었어요<span class="mini">${shapeFig(o,d.sh)}</span>`)}
+  ${row('deliver','🔍','3. 검사관 · 검사하고 납품','삼각자로 재어 보고 이름과 이유를 골라 납품해요',d=>`${who(d)} 📦 납품 · <b>${esc(d.name)}</b>`)}
+  </ol></div>`;
+}
+function tKids(){
+  const K=ST.t.kids;
+  return `<main class="wrap"><h1>확인 문제 · 학생 현황</h1><p class="lead">${NET.on?'학생이 문제를 풀면 결과가 여기에 바로 모여요. 숫자는 한 번에 맞힌 문제 수예요.':'학생 화면과 연결되어 있지 않아요. 학생 아이패드 화면을 직접 확인해 주세요.'}</p>
+  <div class="kids">${[1,2,3].map(n=>{const k=K[n];return `<div class="card kid ${k?'':'off'}"><div class="kid-h"><span class="kid-em">${AV[n]}</span><b>${n}번</b><span class="sub">${k?(SNAME[k.tab]||'')+' 하는 중':'아직 연결 안 됨'}</span></div>
+  <ul class="kid-l"><li>① 수직·평행 <b>${k?k.lines.length:0} / ${LINE_M.length}</b></li><li>② 변신 사각형 <b>${k?k.morph.length:0} / ${MORPH_M.length}</b></li>
+  ${[1,2,3].map(l=>{const q=k&&k.quiz[l];return `<li><span class="stc">${'★'.repeat(l)}</span> ${QUIZ[l].title} <b>${q?`${q.n} / ${q.of}`:'–'}</b>${q&&q.self?`<div class="self">${q.self}</div>`:''}</li>`;}).join('')}</ul></div>`;}).join('')}</div></main>`;
 }
 function answerHTML(o){
   const A=o.answer;let fig;
@@ -590,7 +783,9 @@ function answerHTML(o){
 
 /* ---------- 학생 화면 ---------- */
 function studentView(){
-  const S=ST.s,tabs=[['lines','① 수직·평행'],['morph','② 변신 사각형'],['shop','③ 사각형 공방'],['quiz','④ 확인 문제']];
+  const S=ST.s,tabs=STABS.map(k=>[k,SNAME[k]]);
+  if(!S.me)return topbar('s',tabs,S.tab)+`<main class="wrap"><h1>내 번호를 골라요</h1><p class="lead">선생님이 알려 준 번호를 눌러요. 이 아이패드에서는 한 번만 고르면 돼요.</p>
+  <div class="roles">${[1,2,3].map(n=>`<button class="role" data-act="sMeSet" data-k="${n}"><div class="em">${AV[n]}</div><b>${n}번</b></button>`).join('')}</div></main>`;
   return topbar('s',tabs,S.tab)+({lines:sLines,morph:sMorph,shop:sShop,quiz:sQuiz}[S.tab])();
 }
 function sLines(){
@@ -616,11 +811,15 @@ function sMorph(){
 }
 function sShop(){
   const S=ST.s.shop;
-  if(!S.role)return `<main class="wrap"><h1>사각형 공방</h1><p class="lead">오늘 내가 맡을 일을 골라요.</p>
-  <div class="roles">${ROLES.map(r=>`<button class="role" data-act="sRole" data-k="${r.k}"><div class="em">${r.em}</div><b>${r.n}</b><span>${r.d}</span></button>`).join('')}</div></main>`;
+  if(!S.role)return `<main class="wrap"><h1>사각형 공방</h1><p class="lead">세 사람이 한 팀이 되어 손님의 주문을 해결해요. 1번 일부터 차례대로 이어서 해요. 내가 맡을 일을 골라요.</p>
+  <div class="roles">${ROLES.map((r,i)=>`<button class="role" data-act="sRole" data-k="${r.k}"><span class="num">${i+1}</span><div class="em">${r.em}</div><b>${r.n}</b><span>${r.d}</span></button>`).join('')}</div></main>`;
   const r=ROLES.find(x=>x.k===S.role);
-  return `<main class="wrap"><div class="role-bar"><span class="role-tag">${r.em} ${r.n}</span><button class="btn ghost sm" data-act="sRole" data-k="">역할 바꾸기</button></div>
-  <div class="row"><span class="prog">선생님 화면의 주문 번호를 눌러요</span><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="sShopGo" data-i="${i}">${i+1}</button>`).join('')}</div></div>
+  const todo={read:['주문을 읽고, 조건이 되는 말을 눌러 밑줄을 그어요.','조건을 모두 골라 확인을 눌러요.','✏️ 만들기 담당에게 조건을 또박또박 말해 줘요.'],
+    build:['📜 주문서 담당이 말해 준 조건을 눌러 적어 두어요.','점판에 선을 긋거나 사각형을 만들어요.','검사하기를 눌러요. 맞으면 🔍 검사관에게 넘어가요.'],
+    check:['✏️ 만들기 담당이 만든 그림을 삼각자로 재어 봐요.','질문에 답하고, 이름과 이유를 골라요.','📦 납품하기를 눌러요.']}[S.role];
+  return `<main class="wrap"><div class="role-bar"><span class="role-tag">${r.em} ${r.n}</span><span class="prog">· 주문 ${S.i+1} ${ORDERS[S.i].who}</span><button class="btn ghost sm" data-act="sRole" data-k="" style="margin-left:auto">역할 바꾸기</button></div>
+  <div class="todo">내가 할 일<ol>${todo.map(t=>`<li>${t}</li>`).join('')}</ol></div>
+  ${NET.on?'<p class="follow">🔗 주문 번호는 선생님 화면을 따라 바뀌어요.</p>':`<div class="row"><span class="prog">선생님 화면의 주문 번호를 눌러요</span><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="sShopGo" data-i="${i}">${i+1}</button>`).join('')}</div></div>`}
   ${({read:sRead,build:sBuild,check:sCheck}[S.role])()}</main>`;
 }
 function sRead(){
@@ -668,7 +867,11 @@ function sCheck(){
     need=['eq'];
   }
   const ready=need.every(q=>st.a[q])&&(o.type!=='vip'||st.num);
-  return h+`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div><div id="check-fb">${st.fb||''}</div>`;
+  h+=`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div><div id="check-fb">${st.fb||''}</div>`;
+  const sh=ST.s.shop.recv[ST.s.shop.i];
+  if(!NET.on)return h;
+  return `<div class="grid2"><div>${sh?`<div class="card board-card">${shapeFig(o,sh)}<div class="cap">✏️ 만들기 담당이 보낸 그림</div></div>`
+    :'<div class="wait">⏳ 만들기 담당이 아직 그림을 보내지 않았어요.<br>다 만들면 여기에 그림이 나타나요.<br>친구 화면을 보고 먼저 검사해도 돼요.</div>'}</div><div>${h}</div></div>`;
 }
 function sQuiz(){
   const Q=ST.s.quiz;
@@ -677,8 +880,8 @@ function sQuiz(){
   const set=QUIZ[Q.lv];
   if(Q.fin){const n=Q.first.filter(Boolean).length;
     return `<main class="wrap"><div class="card fin"><div class="big-st">${'★'.repeat(Q.lv)}</div><h1>${set.title} 끝!</h1><p class="lead">${set.qs.length}문제 중 <b>${n}문제</b>를 한 번에 맞혔어요.</p>
-    <div class="qblock"><h3>오늘 수업, 나는?</h3><div class="opts">${SELF.map(s=>`<button class="opt ${Q.self===s?'sel':''}" data-act="qSelf" data-v="${s}">${s}</button>`).join('')}</div>${Q.self?'<div class="fb ok">좋아요! 선생님께 화면을 보여 주세요.</div>':''}</div>
-    <div class="row center"><button class="btn" data-act="qBack">다른 단계 풀기</button></div></div></main>`;}
+    <div class="qblock"><h3>오늘 수업, 나는?</h3><div class="opts">${SELF.map(s=>`<button class="opt ${Q.self===s?'sel':''}" data-act="qSelf" data-v="${s}">${s}</button>`).join('')}</div>${Q.self?`<div class="fb ok">${NET.on?'좋아요! 선생님 화면에도 내 결과가 보여요.':'좋아요! 선생님께 화면을 보여 주세요.'}</div>`:''}</div>
+    <div class="row center">${Q.lv<3?`<button class="btn acc big" data-act="qLv" data-l="${Q.lv+1}">${'★'.repeat(Q.lv+1)} 다음 단계 도전 →</button>`:''}<button class="btn ghost" data-act="qBack">단계 고르기</button></div></div></main>`;}
   const q=set.qs[Q.i],cls=j=>Q.sel!==j?'':Q.ok?'sel-ok':'sel-no';
   let choices;
   if(q.type==='pic')choices=`<div class="picgrid">${q.choices.map((P,j)=>`<button class="pic ${cls(j)}" data-act="qPick" data-i="${j}">${figSVG(P,{box:[-.6,-.6,7.2,5.2]})}</button>`).join('')}</div>`;
@@ -702,18 +905,34 @@ function judge(Q,ok){
 
 /* ---------- 버튼 동작 ---------- */
 const ACT={
-  tab(el){ST[el.dataset.who].tab=el.dataset.k;render();scrollTo(0,0);},
+  tab(el){ST[el.dataset.who].tab=el.dataset.k;render();scrollTo(0,0);if(el.dataset.who==='s')sendSnap();},
   say(el){speak(el.dataset.t);},
-  twAsk(el){const T=ST.t.tw;if(!T.asked.includes(el.dataset.k))T.asked.push(el.dataset.k);ding('ok');render();},
+  twAsk(el){const T=ST.t.tw,k=el.dataset.k;if(!T.asked.includes(k))T.asked.push(k);T.msg='';ding(CANDS.find(c=>c.secret).p[k]?'ok':'no');render();},
+  twGuess(el){const T=ST.t.tw,i=+el.dataset.i,c=CANDS[i];
+    if(c.secret){T.won=true;T.msg='';ding('bell');}
+    else{if(!T.guessed.includes(i))T.guessed.push(i);T.msg=`아니요! ${c.label==='???'?'그 도형이':josa(c.label,'이','가')} 아니에요`;ding('no');}
+    render();},
+  twHide(){ST.t.tw.hide=!ST.t.tw.hide;render();},
   twReveal(){ST.t.tw.reveal=true;ding('bell');render();},
-  twReset(){ST.t.tw={asked:[],reveal:false};render();},
+  tReset(){const T=ST.t;
+    if(T.tab==='twenty')T.tw=newTw();
+    else if(T.tab==='demo'){T.demo={marks:true,name:false};if(BOARDS.tdemo)BOARDS.tdemo.P=clone(PRESET['정사각형']);}
+    else if(T.tab==='table')T.table={rev:{},step:0};
+    else if(T.tab==='shop'){Object.assign(T.shop,{i:0,reveal:false,run:false,tLeft:120,prog:{}});send({t:'order',i:0});}
+    render();scrollTo(0,0);},
+  tMove(el){const i=TTABS.findIndex(x=>x[0]===ST.t.tab)+(+el.dataset.d);if(TTABS[i]){ST.t.tab=TTABS[i][0];render();scrollTo(0,0);}},
+  tSend(el){const k=el.dataset.k;send({t:'go',tab:k});if(k==='shop')send({t:'order',i:ST.t.shop.i});toast(`📱 학생 화면을 <b>${SNAME[k]}</b>(으)로 바꿨어요`,2500);},
+  sMe(){ST.s.me=null;render();scrollTo(0,0);},
+  sMeSet(el){const k=el.dataset.k;ST.s.me=k;try{localStorage.setItem('sagak-me',k);}catch(_){}ding('ok');render();sendSnap(true);},
+  tblStep(){const T=ST.t.table;T.step=Math.min(4,(T.step||0)+1);render();},
+  tblStepHide(){ST.t.table.step=0;render();},
   demoPreset(el){BOARDS.tdemo.P=clone(PRESET[el.dataset.k]);render();},
   demoMarks(){ST.t.demo.marks=!ST.t.demo.marks;render();},
   demoName(){ST.t.demo.name=!ST.t.demo.name;render();},
   tblCell(el){const R=ST.t.table.rev,k=el.dataset.k;R[k]=!R[k];render();},
   tblAll(){TABLE.forEach((r,i)=>r.c.forEach((_,j)=>{ST.t.table.rev[i+'-'+j]=true;}));render();},
   tblHide(){ST.t.table.rev={};render();},
-  tShopGo(el){const S=ST.t.shop;S.i=+el.dataset.i;S.reveal=false;ding('bell');render();},
+  tShopGo(el){const S=ST.t.shop,i=+el.dataset.i;if(!okI(i,ORDERS.length))return;S.i=i;S.reveal=false;ding('bell');send({t:'order',i});render();},
   tBell(){ding('bell');},
   tTimer(){const S=ST.t.shop;if(S.run)S.run=false;else{if(S.tLeft<=0)S.tLeft=120;S.tEnd=Date.now()+S.tLeft*1000;S.run=true;}render();},
   tTimerReset(){const S=ST.t.shop;S.run=false;S.tLeft=120;render();},
@@ -724,14 +943,14 @@ const ACT={
   lineHint(){const S=ST.s.lines;S.fb=`<div class="fb tip">💡 ${LINE_M[S.i].hint}</div>`;setHTML('sline-fb',S.fb);},
   lineCheck(){const S=ST.s.lines,m=LINE_M[S.i],b=BOARDS.sline,r=lineCheck(m.given,b.ua,b.ub);
     b.checked=r.kind==='perp'||r.kind==='para';b.render();S.fb=lineFeedback(r.kind,m.target);
-    if(r.kind===m.target){S.done[S.i]=true;ding('ok');}else ding('no');render();},
+    if(r.kind===m.target){S.done[S.i]=true;ding('ok');sendSnap();}else ding('no');render();},
   morphSel(el){const S=ST.s.morph;S.i=+el.dataset.i;S.fb='';if(BOARDS.smorph)BOARDS.smorph.P=clone(PRESET['정사각형']);render();},
   morphReset(){BOARDS.smorph.P=clone(PRESET['정사각형']);ST.s.morph.fb='';render();},
   morphMarks(){ST.s.morph.marks=!ST.s.morph.marks;render();},
   morphHint(){const S=ST.s.morph;S.fb=`<div class="fb tip">💡 ${MORPH_M[S.i].hint}</div>`;render();},
   morphCheck(){const S=ST.s.morph,m=MORPH_M[S.i],an=BOARDS.smorph.an;
     if(!an.ok){S.fb=`<div class="fb tip">⚠️ ${an.msg}</div>`;ding('no');}
-    else if(m.check(an)){S.done[S.i]=true;ding('ok');const fam=FAMILY[an.name];
+    else if(m.check(an)){S.done[S.i]=true;ding('ok');sendSnap();const fam=FAMILY[an.name];
       S.fb=(S.i===1&&an.name==='마름모')?'<div class="fb ok">🎉 성공! 마름모가 됐네요. 마름모도 마주 보는 두 쌍의 변이 평행해서 <b>평행사변형</b>이에요.</div>'
         :`<div class="fb ok">🎉 성공! 이 사각형의 이름은 <b>${josa(an.name,'이에요','예요')}</b>.${fam.length?`<br><span class="sub">${fam.join('·')}이기도 해요.</span>`:''}</div>`;}
     else{S.fb=`<div class="fb no">아직이에요. 지금은 평행한 변 ${an.par}쌍, 직각 ${an.right}개예요. ${lenText(an)}.</div>`;ding('no');}
@@ -743,6 +962,7 @@ const ACT={
   rCheck(){const o=ORDERS[ST.s.shop.i],st=sst('read'),sel=Object.keys(st.sel).filter(k=>st.sel[k]);
     const ok=sel.length===o.conds.length&&o.conds.every(k=>st.sel[k]);st.checked=true;
     st.fb=ok?'<div class="fb ok">🎉 맞아요! 만들기 담당에게 조건을 또박또박 말해 주세요.</div>':'<div class="fb no">초록은 맞은 조건, 점선은 빠진 조건, 빨강은 주문에 없는 조건이에요. 다시 골라 봐요.</div>';
+    if(ok&&!st.sent&&NET.on){st.sent=1;send({t:'shop',step:'read',i:ST.s.shop.i,me:ST.s.me});}
     ding(ok?'ok':'no');render();},
   bMemo(el){const st=sst('build');st.memo[el.dataset.k]=!st.memo[el.dataset.k];el.classList.toggle('sel');},
   bReset(){delete BOARDS['build'+ST.s.shop.i];sst('build').fb='';render();},
@@ -755,6 +975,9 @@ const ACT={
         html=`<div class="fb ${ok?'ok':'no'}">${ok?'🎉 주문대로 만들었어요! 검사관에게 보여 주세요.':'아직 주문과 달라요. 다시 고쳐 볼까요?'}<ul class="checks">${o.conds.map(k=>`<li>${CEVAL[k](an)?'✅':'❌'} ${COND[k][1]}</li>`).join('')}</ul><div class="sub">지금: 평행한 변 ${an.par}쌍 · 직각 ${an.right}개 · ${lenText(an)}</div></div>`;}}
     else if(o.type==='line'){const r=lineCheck(o.given,b.ua,b.ub);b.checked=r.kind==='perp'||r.kind==='para';b.render();ok=r.kind===o.target;html=lineFeedback(r.kind,o.target);}
     else{ok=b.labels.every(Boolean);html=ok?'<div class="fb ok">🎉 네 변이 모두 5cm예요! 검사관이 테두리 길이를 계산해요.</div>':"<div class=\"fb no\">아직 '?'인 변이 있어요. 마름모는 네 변의 길이가 어떤가요?</div>";}
+    if(ok&&NET.on){const sh=shapeOf(o,b),js=JSON.stringify(sh);
+      if(st.sent!==js){st.sent=js;send(Object.assign({t:'shop',step:'build',i,me:ST.s.me},sh));}
+      html+='<div class="fb tip">📨 검사관 화면과 선생님 화면으로 그림을 보냈어요.</div>';}
     ding(ok?'ok':'no');st.fb=html;setHTML('build-fb',html);},
   cOpt(el){const st=sst('check');st.a[el.dataset.q]=el.dataset.v;st.fb='';render();},
   kp(el){const ctx=el.dataset.ctx,v=el.dataset.v,obj=ctx==='check'?sst('check'):ST.s.quiz;let n=obj.num||'';
@@ -762,25 +985,30 @@ const ACT={
   cSubmit(){
     const o=ORDERS[ST.s.shop.i],st=sst('check'),I=o.ins;let ok,msg;
     if(o.type==='quad'){const nOk=I.accept.includes(st.a.name),rOk=st.a.rs===REASON[I.reason];ok=nOk&&rOk;
-      msg=ok?(st.a.name!==I.name?`🎉 납품 성공! ${josa(st.a.name,'은','는')} 마주 보는 두 쌍의 변이 평행해서 ${I.name}이기도 해요.`:'🎉 납품 성공! 손을 들어 선생님께 알려요.')
+      msg=ok?(st.a.name!==I.name?`🎉 납품 성공! ${josa(st.a.name,'은','는')} 마주 보는 두 쌍의 변이 평행해서 ${I.name}이기도 해요.`:'🎉 납품 성공!')
         :(!nOk?'이름을 다시 생각해 봐요. 평행한 변이 몇 쌍인지, 네 변의 길이가 같은지 살펴봐요.':'이름은 맞았어요! 이유 카드를 다시 골라 봐요.');}
     else if(o.type==='line'){const mOk=st.a.meet===I.meet,nOk=st.a.name===I.name,rOk=st.a.rs===REASON[I.reason];ok=mOk&&nOk&&rOk;
-      msg=ok?'🎉 납품 성공! 손을 들어 선생님께 알려요.':!mOk?'두 선이 어떻게 만나는지 다시 살펴봐요.':!nOk?'선의 이름을 다시 생각해 봐요.':'이유 카드를 다시 골라 봐요.';}
+      msg=ok?'🎉 납품 성공!':!mOk?'두 선이 어떻게 만나는지 다시 살펴봐요.':!nOk?'선의 이름을 다시 생각해 봐요.':'이유 카드를 다시 골라 봐요.';}
     else{const eOk=st.a.eq==='모두 같아요',vOk=+st.num===I.value;ok=eOk&&vOk;
       msg=ok?'🎉 VIP 납품 성공! 5 + 5 + 5 + 5 = 20, 금테는 20cm예요.':!eOk?'마름모의 네 변의 길이를 다시 생각해 봐요.':'다시 계산해 봐요. 5cm인 변이 몇 개 있나요?';}
+    if(ok){msg+=NET.on?' 📦 선생님 화면에 도착했어요.':' 손을 들어 선생님께 알려요.';
+      if(!st.sent&&NET.on){st.sent=1;send({t:'shop',step:'deliver',i:ST.s.shop.i,me:ST.s.me,name:o.type==='quad'?st.a.name:o.answer.name});}}
     ding(ok?'ok':'no');st.fb=`<div class="fb ${ok?'ok':'no'}">${msg}</div>`;render();},
   qLv(el){ST.s.quiz={lv:+el.dataset.l,i:0,first:[],wrong:0,sel:null,ok:false,num:'',fin:false,self:null,hint:false};render();scrollTo(0,0);},
   qPick(el){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok)return;const v=+el.dataset.i;Q.sel=v;judge(Q,v===q.ans);},
   qNum(){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok||!Q.num)return;judge(Q,+Q.num===q.ans);},
   qHint(){ST.s.quiz.hint=true;render();},
-  qNext(){const Q=ST.s.quiz;Q.i++;Object.assign(Q,{wrong:0,sel:null,ok:false,num:'',hint:false});if(Q.i>=QUIZ[Q.lv].qs.length)Q.fin=true;render();scrollTo(0,0);},
-  qSelf(el){ST.s.quiz.self=el.dataset.v;render();},
+  qNext(){const Q=ST.s.quiz;Q.i++;Object.assign(Q,{wrong:0,sel:null,ok:false,num:'',hint:false});
+    if(Q.i>=QUIZ[Q.lv].qs.length){Q.fin=true;ST.s.qres[Q.lv]={n:Q.first.filter(Boolean).length,self:null};sendSnap();}
+    render();scrollTo(0,0);},
+  qSelf(el){const Q=ST.s.quiz;Q.self=el.dataset.v;if(ST.s.qres[Q.lv])ST.s.qres[Q.lv].self=Q.self;sendSnap();render();},
   qBack(){ST.s.quiz={lv:null};render();scrollTo(0,0);},
 };
 
 /* ---------- 그리기 시작 ---------- */
 function render(){
   const r=location.hash.slice(1);
+  if(r==='t'||r==='s')netStart();
   document.body.className=r==='t'?'teacher':r==='s'?'student':'home';
   $('#app').innerHTML=r==='t'?teacherView():r==='s'?studentView():homeView();
   document.querySelectorAll('[data-board]').forEach(s=>{const b=BOARDS[s.dataset.board];if(b)s.appendChild(b.svg);});
