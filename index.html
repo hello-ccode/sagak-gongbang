@@ -49,7 +49,7 @@ h1{font-size:1.65em;line-height:1.25;margin:.15em 0;letter-spacing:-.02em}
 .name-box small{display:block;font-size:.5em;font-weight:600;color:var(--sub);margin-top:2px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--sub);font-size:.85em;margin-top:6px}
 .lg{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.lg.r{background:var(--perp)}.lg.b{background:var(--par1)}.lg.o{background:var(--eq)}
+.lg.r{background:var(--perp)}.lg.b{background:var(--par1)}.lg.g{background:var(--par2);margin-left:-3px}.lg.o{background:var(--eq)}
 .fb{padding:13px 16px;border-radius:14px;margin:10px 0;font-weight:600}
 .fb.ok{background:#e5f5ee;color:#0b6646}
 .fb.no{background:#fdeeee;color:#a32b2b}
@@ -67,7 +67,7 @@ body.home{min-height:100vh;display:flex;align-items:center;justify-content:cente
 .hbig small{display:block;font-size:.6em;color:var(--sub);font-weight:600;margin-top:6px}
 /* twenty */
 .cands{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;margin:12px 0 18px}
-@media (max-width:1100px){.cands{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:1100px){.cands{grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 12px}.cand{padding:6px}.cand-svg{width:auto;height:min(8vh,80px);margin:0 auto}.cand.back{aspect-ratio:auto;height:calc(min(8vh,80px) + 42px)}.tq{min-height:64px;padding:6px}}
 .cand{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px;text-align:center;transition:all .6s}
 .cand:disabled{opacity:1;cursor:default}
 .cand-svg{width:100%;display:block}
@@ -125,6 +125,8 @@ body.teacher .board-card .board{max-height:calc(100vh - 260px)}
 .kdots{font-size:1.15em;letter-spacing:2px}
 .ndot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#c9c3b6;margin-left:6px;vertical-align:1px}
 .ndot.on{background:var(--ok)}
+.ndot.bad{background:var(--eq)}
+.net.bad{color:#a05a00}
 button.who{border:0;background:none;font-weight:700}
 #toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-160%);transition:transform .35s;z-index:50;background:var(--ink);color:#fff;border-radius:20px;padding:16px 26px;font-weight:800;font-size:1.15em;line-height:1.5;box-shadow:0 12px 34px rgba(0,0,0,.28);width:max-content;max-width:min(92vw,820px);text-align:center;cursor:pointer}
 #toast.on{transform:translate(-50%,0)}
@@ -301,18 +303,39 @@ function netStart(){
     if(!d||typeof d!=='object'||d.from===NET.me)return;
     try{onNet(d);}catch(_){}};
 }
+/* 보내기 결과를 돌려준다(true=알림 서비스가 받음). 너무 많이 보내 막히면(429) 조금 기다렸다 두 번까지 다시 보낸다. */
 function send(d){
-  if(!NET.on)return;d.from=NET.me;
-  try{fetch('https://ntfy.sh/'+NET.topic,{method:'POST',body:JSON.stringify(d)}).catch(()=>{});}catch(_){}
+  if(!NET.on)return Promise.resolve(false);d.from=NET.me;
+  const body=JSON.stringify(d);
+  const once=()=>fetch('https://ntfy.sh/'+NET.topic,{method:'POST',body}).then(r=>r.status).catch(()=>0);
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  return (async()=>{
+    for(const ms of [0,2500,6000]){
+      if(ms)await wait(ms);
+      let s;try{s=await once();}catch(_){s=0;}
+      if(s>=200&&s<300){if(NET.blocked){NET.blocked=false;netBadge();}return true;}
+      if(s===429&&!NET.blocked){NET.blocked=true;netBadge();}
+      if(s>=400&&s<500&&s!==429)return false;
+    }
+    return false;
+  })();
 }
+function netBadge(){
+  document.querySelectorAll('.ndot').forEach(e=>{e.className='ndot '+(NET.blocked?'bad':NET.on?'on':'');});
+  const n=document.querySelector('.tbar .net');if(n)n.outerHTML=netText();
+}
+const netText=()=>`<span class="net ${NET.blocked?'bad':NET.on?'on':''}">${NET.blocked?'⚠️ 알림이 잠시 막힘 · 손 들기로 진행':NET.on?'● 학생 화면과 연결됨':'○ 연결 안 됨'}</span>`;
 function netChanged(){
   if(NET.on){
-    if(location.hash==='#t'){send({t:'who'});send({t:'order',i:ST.t.shop.i});}
+    if(location.hash==='#t'){send({t:'who'});sendOrder();}
     else if(location.hash==='#s')sendSnap(true);
   }
   softRender();
 }
 const AV={1:'🐯',2:'🐰',3:'🐻'};
+let orderT=0;
+const tag=()=>({ep:ST.t.ep,sep:ST.t.shop.sep,ts:Date.now()});
+function sendOrder(later){clearTimeout(orderT);const go=()=>send(Object.assign({t:'order',i:ST.t.shop.i},tag()));if(later)orderT=setTimeout(go,1500);else go();}
 const STABS=['lines','morph','shop','quiz'];
 const okI=(n,max)=>Number.isInteger(n)&&n>=0&&n<max;
 const okXY=p=>p&&Number.isInteger(p.x)&&Number.isInteger(p.y)&&p.x>=0&&p.x<11&&p.y>=0&&p.y<8;
@@ -441,6 +464,7 @@ class Board{
   changed(){if(this.onChange)this.onChange(this);}
   down(e){
     if(this.locked)return;
+    lockH();
     const p=this.pt(e);
     if(this.mode==='quad'){
       let best=-1,bd=.75*.75;
@@ -481,9 +505,18 @@ class Board{
     this.svg.innerHTML=s;
   }
 }
+function lockH(){const b=document.body,h=document.documentElement.scrollHeight;if((parseFloat(b.style.minHeight)||0)<h)b.style.minHeight=h+'px';}
+/* 결과 글이 화면 밖(아래)에 생기면 보이는 곳까지 내려 준다 */
+function seeFb(id){requestAnimationFrame(()=>{const e=document.getElementById(id);if(!e||!e.firstElementChild)return;const r=e.getBoundingClientRect();if(r.bottom>innerHeight-8||r.top<64)e.scrollIntoView({block:'nearest',behavior:'smooth'});});}
 function distSeg(p,a,b){const ab=sub(b,a),ap=sub(p,a);let t=dot(ap,ab)/len2(ab);t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-(a.x+ab.x*t),p.y-(a.y+ab.y*t));}
 const BOARDS={};
-function board(key,make){if(!BOARDS[key])BOARDS[key]=make();return BOARDS[key];}
+function board(key,make){
+  if(!BOARDS[key]){const b=make(),v=SAVEDB[key];
+    if(v)try{if(v.P&&b.P&&v.P.length===4&&v.P.every(q=>okXY({x:q[0],y:q[1]})))b.P=pts(v.P);
+      if(b.mode==='line'){b.ua=okXY(v.ua)?v.ua:null;b.ub=okXY(v.ub)?v.ub:null;}
+      if(b.mode==='label'&&Array.isArray(v.labels)&&v.labels.length===4)b.labels=v.labels.map((x,i)=>b.fixed[i]||x?b.val:'');b.render();}catch(_){}
+    delete SAVEDB[key];BOARDS[key]=b;}
+  return BOARDS[key];}
 
 /* ---------- 자료 ---------- */
 const PRESET={
@@ -590,11 +623,30 @@ const ROLES=[
 
 /* ---------- 상태 ---------- */
 const newTw=()=>({asked:[],guessed:[],won:false,reveal:false,hide:false,msg:''});
+const newId=()=>Math.random().toString(36).slice(2,8);
+const newT=()=>({tab:'twenty',tw:newTw(),demo:{marks:true,name:false},table:{rev:{},step:0},shop:{i:0,reveal:false,stars:0,tLeft:120,tEnd:0,run:false,prog:{},sep:newId()},kids:{},ep:newId()});
+const newS=me=>({me,tab:'lines',lines:{i:0,fb:'',done:{}},morph:{i:0,fb:'',done:{},marks:true},shop:{role:null,i:0,st:{},recv:{},sep:null},quiz:{lv:null},qres:{},ep:null});
 let savedMe=null;try{savedMe=localStorage.getItem('sagak-me');}catch(_){}
-const ST={
-  t:{tab:'twenty',tw:newTw(),demo:{marks:true,name:false},table:{rev:{},step:0},shop:{i:0,reveal:false,stars:0,tLeft:120,tEnd:0,run:false,prog:{}},kids:{}},
-  s:{me:AV[savedMe]?savedMe:null,tab:'lines',lines:{i:0,fb:'',done:{}},morph:{i:0,fb:'',done:{},marks:true},shop:{role:null,i:0,st:{},recv:{}},quiz:{lv:null},qres:{}},
-};
+const ST={t:newT(),s:newS(AV[savedMe]?savedMe:null)};
+/* 새로고침해도 진행 기록이 남도록 이 기기에 저장한다(6시간 지나면 버림). 이름은 저장하지 않는다. */
+const SKEY='sagak-v2-'+ROOM+'-';
+function saveState(){
+  const r=location.hash;if(r!=='#t'&&r!=='#s')return;
+  try{
+    if(r==='#t'){const T=ST.t;localStorage.setItem(SKEY+'t',JSON.stringify({ts:Date.now(),tab:T.tab,tw:T.tw,demo:T.demo,table:T.table,shop:{i:T.shop.i,reveal:T.shop.reveal,stars:T.shop.stars,prog:T.shop.prog,sep:T.shop.sep},kids:T.kids,ep:T.ep}));}
+    else{const S=ST.s;localStorage.setItem(SKEY+'s',JSON.stringify({ts:Date.now(),tab:S.tab,lines:{i:S.lines.i,done:S.lines.done},morph:{i:S.morph.i,done:S.morph.done,marks:S.morph.marks},shop:S.shop,quiz:S.quiz,qres:S.qres,ep:S.ep,ots:S.ots,boards:boardSnap()}));}
+  }catch(_){}
+}
+let SAVEDB={};
+function boardSnap(){const o={};Object.keys(BOARDS).forEach(k=>{if(k==='tdemo')return;const b=BOARDS[k];o[k]={P:b.P?b.P.map(p=>[p.x,p.y]):null,ua:b.ua,ub:b.ub,labels:b.labels||null};});return Object.assign({},SAVEDB,o);}
+function loadState(){
+  const get=k=>{try{const v=JSON.parse(localStorage.getItem(SKEY+k));return v&&Date.now()-v.ts<6*3600e3?v:null;}catch(_){return null;}};
+  const t=get('t');if(t)try{const T=ST.t;Object.assign(T,{tab:t.tab||T.tab,tw:t.tw||T.tw,demo:t.demo||T.demo,table:t.table||T.table,kids:t.kids||{},ep:t.ep||T.ep});Object.assign(T.shop,t.shop||{});}catch(_){}
+  const s=get('s');if(s)try{const S=ST.s;Object.assign(S,{tab:STABS.includes(s.tab)?s.tab:'lines',quiz:s.quiz||S.quiz,qres:s.qres||{},ep:s.ep||null,ots:s.ots||0});SAVEDB=s.boards||{};
+    Object.assign(S.lines,s.lines||{});Object.assign(S.morph,s.morph||{});Object.assign(S.shop,s.shop||{});S.shop.st=S.shop.st||{};S.shop.recv=S.shop.recv||{};Object.values(S.shop.st).forEach(x=>{if(x&&x.sending){delete x.sending;if(x.sent===1)x.sent=0;}});if(S.quiz&&S.quiz.net==='sending')S.quiz.net='fail';}catch(_){}
+}
+loadState();
+function dropBoards(pre){Object.keys(BOARDS).forEach(k=>{if(k.startsWith(pre))delete BOARDS[k];});}
 function sst(role){const S=ST.s.shop,k=role+S.i;return S.st[k]||(S.st[k]={});}
 function busy(){return Object.values(BOARDS).some(b=>b.drag!=null);}
 let rT=0;
@@ -602,10 +654,10 @@ function softRender(){clearTimeout(rT);if(busy()){rT=setTimeout(softRender,300);
 
 /* ---------- 연동: 학생 → 선생님 ---------- */
 let snapT=0;
-function sendSnap(hello){
+function sendSnap(hello,delay,cb){
   const S=ST.s;if(!S.me||location.hash!=='#s')return;
   clearTimeout(snapT);
-  snapT=setTimeout(()=>{send({t:'snap',me:S.me,hello:hello?1:0,tab:S.tab,lines:Object.keys(S.lines.done).map(Number),morph:Object.keys(S.morph.done).map(Number),quiz:S.qres});},hello?50:700);
+  snapT=setTimeout(()=>{send({t:'snap',me:S.me,ep:S.ep,hello:hello?1:0,tab:S.tab,lines:Object.keys(S.lines.done).map(Number),morph:Object.keys(S.morph.done).map(Number),quiz:S.qres}).then(g=>{if(cb)cb(g);});},delay||(hello?50:700));
 }
 function shapeOf(o,b){
   if(o.type==='quad')return{P:b.P.map(p=>[p.x,p.y])};
@@ -622,6 +674,16 @@ function shapeFig(o,sh){
   if(o.type==='line')return figLinesSVG(o.given,{a:sh.ua,b:sh.ub},{cols:11,rows:8});
   return figSVG(VIP_P,{labels:sh.labels,grid:false,pad:1.2});
 }
+/* 학생: 선생님 메시지의 수업 번호(ep)·공방 번호(sep)를 맞춘다. 옛 메시지면 null, 기록을 지웠으면 true */
+function stuSync(d){
+  const S=ST.s;
+  if(typeof d.ts==='number'&&S.ots&&d.ts<S.ots)return null;
+  let re=false;
+  if(typeof d.ep==='string'){if(S.ep&&S.ep!==d.ep){Object.assign(S,newS(S.me));dropBoards('');SAVEDB={};re=true;}S.ep=d.ep;}
+  if(typeof d.sep==='string'){if(S.shop.sep&&S.shop.sep!==d.sep&&!re){Object.assign(S.shop,{i:0,st:{},recv:{}});dropBoards('build');SAVEDB={};re=true;}S.shop.sep=d.sep;}
+  if(typeof d.ts==='number')S.ots=d.ts;
+  return re;
+}
 function onNet(d){
   const r=location.hash;
   if(r==='#t'){
@@ -629,39 +691,48 @@ function onNet(d){
     if(d.t==='snap'&&AV[d.me]){
       const q={};[1,2,3].forEach(l=>{const x=d.quiz&&d.quiz[l];if(x&&Number.isInteger(x.n))q[l]={n:Math.max(0,Math.min(x.n,QUIZ[l].qs.length)),of:QUIZ[l].qs.length,self:SELF.includes(x.self)?x.self:null};});
       const arr=(a,max)=>Array.isArray(a)?a.filter(n=>okI(n,max)):[];
-      T.kids[d.me]={tab:STABS.includes(d.tab)?d.tab:'',lines:arr(d.lines,LINE_M.length),morph:arr(d.morph,MORPH_M.length),quiz:q};
-      if(d.hello)send({t:'order',i:T.shop.i});
+      if(d.ep&&d.ep!==T.ep){sendOrder(true);return;}
+      const old=d.ep===T.ep?T.kids[d.me]:null,uni=(a,b)=>[...new Set([...(a||[]),...b])].sort();
+      T.kids[d.me]={tab:STABS.includes(d.tab)?d.tab:'',lines:uni(old&&old.lines,arr(d.lines,LINE_M.length)),morph:uni(old&&old.morph,arr(d.morph,MORPH_M.length)),quiz:Object.assign({},old&&old.quiz,q)};
+      if(d.hello||d.ep!==T.ep)sendOrder(true);
+      saveState();
       setHTML('tbar-kids',kidDots());
       if(T.tab==='kids')softRender();
     }
     if(d.t==='shop'&&okI(d.i,ORDERS.length)&&AV[d.me]){
       const o=ORDERS[d.i],P=T.shop.prog[d.i]||(T.shop.prog[d.i]={}),tag=`${AV[d.me]} ${d.me}번`;
       if(d.step==='read'&&!P.read){P.read={me:d.me};}
-      else if(d.step==='build'){const sh=cleanShape(o,d);if(!sh)return;P.build={me:d.me,sh};if(!P.deliver)ding('ok');}
-      else if(d.step==='deliver'&&!P.deliver){
+      else if(d.step==='build'){if(d.sep&&d.sep!==T.shop.sep)return;const sh=cleanShape(o,d);if(!sh)return;P.build={me:d.me,sh};if(!P.deliver)ding('ok');}
+      else if(d.step==='deliver'&&!P.deliver){if(d.sep&&d.sep!==T.shop.sep)return;
         const name=o.type==='quad'?(o.ins.accept.includes(d.name)?d.name:o.ins.name):o.answer.name;
         P.deliver={me:d.me,name};T.shop.stars++;ding('bell');
         toast(`📦 납품 도착! 주문 ${d.i+1} · ${o.who} ${o.name}<br>${tag} 검사관: <b>${esc(name)}</b> · ⭐ 하나 받았어요`,8000);
       }else return;
-      if(T.tab==='shop')softRender();
+      saveState();if(T.tab==='shop')softRender();
     }
   }else if(r==='#s'){
     const S=ST.s;
-    if(d.t==='order'&&okI(d.i,ORDERS.length)){if(S.shop.i!==d.i){S.shop.i=d.i;if(S.tab==='shop')softRender();}}
-    else if(d.t==='go'&&STABS.includes(d.tab)){S.tab=d.tab;ding('bell');softRender();scrollTo(0,0);sendSnap();}
+    if(d.t==='order'&&okI(d.i,ORDERS.length)){
+      const re=stuSync(d);if(re===null)return;
+      if(S.shop.i!==d.i||re){S.shop.i=d.i;softRender();}
+      if(re)sendSnap();saveState();}
+    else if(d.t==='go'&&STABS.includes(d.tab)){
+      const re=stuSync(d);if(re===null)return;
+      S.tab=d.tab;if(d.tab==='shop'&&okI(d.i,ORDERS.length))S.shop.i=d.i;ding('bell');softRender();scrollTo(0,0);if(re)sendSnap();saveState();}
     else if(d.t==='who')sendSnap();
     else if(d.t==='shop'&&d.step==='build'&&okI(d.i,ORDERS.length)){
-      const sh=cleanShape(ORDERS[d.i],d);if(!sh)return;S.shop.recv[d.i]=sh;
+      if(d.sep&&S.shop.sep&&d.sep!==S.shop.sep)return;
+      const sh=cleanShape(ORDERS[d.i],d);if(!sh)return;S.shop.recv[d.i]=sh;saveState();
       if(S.tab==='shop'&&S.shop.role==='check'&&S.shop.i===d.i){ding('ok');softRender();}
     }
   }
 }
 
 /* ---------- 공통 조각 ---------- */
-const ndot=()=>`<i class="ndot ${NET.on?'on':''}" title="${NET.on?'연결됨':'연결 안 됨'}"></i>`;
+const ndot=()=>`<i class="ndot ${NET.blocked?'bad':NET.on?'on':''}" title="${NET.blocked?'잠시 막힘':NET.on?'연결됨':'연결 안 됨'}"></i>`;
 const topbar=(who,tabs,cur)=>`<header class="top"><a class="brand" href="#">◇ 사각형 공방</a><nav class="tabs">${tabs.map(([k,l])=>`<button class="tab ${k===cur?'on':''}" data-act="tab" data-who="${who}" data-k="${k}">${l}</button>`).join('')}</nav>${who==='t'?`<span class="who">🖥️ 선생님${ndot()}</span>`:`<button class="who" data-act="sMe">${ST.s.me?`${AV[ST.s.me]} ${ST.s.me}번`:'📱 학생'}${ndot()}</button>`}</header>`;
 const sayBtn=t=>`<button class="say" data-act="say" data-t="${esc(t)}" aria-label="읽어 주기">🔊</button>`;
-const legendHTML=()=>`<div class="legend"><span><i class="lg r"></i>직각(수직)</span><span><i class="lg b"></i>평행한 변</span><span><i class="lg o"></i>길이가 같은 변</span></div>`;
+const legendHTML=()=>`<div class="legend"><span><i class="lg r"></i>직각(수직)</span><span><i class="lg b"></i><i class="lg g"></i>평행한 변(같은 색끼리)</span><span><i class="lg o"></i>길이가 같은 변</span></div>`;
 const condChip=k=>`<span class="chip"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</span>`;
 const keypad=ctx=>`<div class="keypad">${['1','2','3','4','5','6','7','8','9','del','0'].map(v=>`<button data-act="kp" data-ctx="${ctx}" data-v="${v}">${v==='del'?'⌫':v}</button>`).join('')}</div>`;
 const missionTabs=(act,list,S)=>`<div class="mission-tabs">${list.map((m,i)=>`<button class="mt ${i===S.i?'on':''} ${S.done[i]?'done':''}" data-act="${act}" data-i="${i}">문제 ${i+1} <span class="st-s">${'★'.repeat(m.lv)}</span></button>`).join('')}</div>`;
@@ -698,7 +769,7 @@ function tbar(){
   const T=ST.t,idx=TTABS.findIndex(x=>x[0]===T.tab);
   const send=(SEND[T.tab]||[]).map(k=>`<button class="btn ghost sm" data-act="tSend" data-k="${k}" ${NET.on?'':'disabled'}>📱 학생 화면 → ${SNAME[k]}</button>`).join('');
   return `<nav class="tbar">${T.tab!=='kids'?'<button class="btn ghost" data-act="tReset">⟲ 처음부터</button>':''}
-  <div class="tbar-mid">${send}<span id="tbar-kids">${kidDots()}</span><span class="net ${NET.on?'on':''}">${NET.on?'● 학생 화면과 연결됨':'○ 연결 안 됨'}</span></div>
+  <div class="tbar-mid">${send}<span id="tbar-kids">${kidDots()}</span>${netText()}</div>
   <button class="btn ghost" data-act="tMove" data-d="-1" ${idx<=0?'disabled':''}>◀ 이전</button><button class="btn acc" data-act="tMove" data-d="1" ${idx>=TTABS.length-1?'disabled':''}>다음으로 ▶</button></nav>`;
 }
 function tTwenty(){
@@ -771,7 +842,8 @@ function tKids(){
   return `<main class="wrap"><h1>확인 문제 · 학생 현황</h1><p class="lead">${NET.on?'학생이 문제를 풀면 결과가 여기에 바로 모여요. 숫자는 한 번에 맞힌 문제 수예요.':'학생 화면과 연결되어 있지 않아요. 학생 아이패드 화면을 직접 확인해 주세요.'}</p>
   <div class="kids">${[1,2,3].map(n=>{const k=K[n];return `<div class="card kid ${k?'':'off'}"><div class="kid-h"><span class="kid-em">${AV[n]}</span><b>${n}번</b><span class="sub">${k?(SNAME[k.tab]||'')+' 하는 중':'아직 연결 안 됨'}</span></div>
   <ul class="kid-l"><li>① 수직·평행 <b>${k?k.lines.length:0} / ${LINE_M.length}</b></li><li>② 변신 사각형 <b>${k?k.morph.length:0} / ${MORPH_M.length}</b></li>
-  ${[1,2,3].map(l=>{const q=k&&k.quiz[l];return `<li><span class="stc">${'★'.repeat(l)}</span> ${QUIZ[l].title} <b>${q?`${q.n} / ${q.of}`:'–'}</b>${q&&q.self?`<div class="self">${q.self}</div>`:''}</li>`;}).join('')}</ul></div>`;}).join('')}</div></main>`;
+  ${[1,2,3].map(l=>{const q=k&&k.quiz[l];return `<li><span class="stc">${'★'.repeat(l)}</span> ${QUIZ[l].title} <b>${q?`${q.n} / ${q.of}`:'–'}</b>${q&&q.self?`<div class="self">${q.self}</div>`:''}</li>`;}).join('')}</ul></div>`;}).join('')}</div>
+  <div class="row gap-top"><button class="btn ghost sm" data-act="tNewClass">🆕 새 수업 시작 (모든 기록 지우기)</button><span class="sub">리허설을 한 뒤, 실제 수업 전에 한 번 눌러요.</span></div></main>`;
 }
 function answerHTML(o){
   const A=o.answer;let fig;
@@ -830,10 +902,10 @@ function sRead(){
   <div class="qblock"><h3>이 주문의 조건을 모두 골라요</h3><div class="pool">${o.pool.map(k=>{let c='';
     if(st.checked){const need=o.conds.includes(k),sel=!!st.sel[k];c=need&&sel?'good':need?'miss':sel?'bad':'';}else if(st.sel[k])c='sel';
     return `<button class="pchip ${c}" data-act="rSel" data-k="${k}">${COND[k][1]}</button>`;}).join('')}</div>
-  <div class="row"><button class="btn" data-act="rCheck">확인</button></div>${st.fb||''}</div>`;
+  <div class="row"><button class="btn" data-act="rCheck">확인</button></div><div id="read-fb">${st.fb||''}</div></div>`;
 }
 function makeBuildBoard(o){
-  const clear=bb=>{const st=sst('build');st.fb='';setHTML('build-fb','');if(bb.mode==='quad'&&bb.showMarks){bb.showMarks=false;bb.render();}};
+  const clear=bb=>{const st=sst('build');st.fb='';st.base=null;setHTML('build-fb','');if(bb.mode==='quad'&&bb.showMarks){bb.showMarks=false;bb.render();}};
   if(o.type==='quad')return new Board({P:PRESET['정사각형'],showMarks:false,onChange:clear});
   if(o.type==='line')return new Board({mode:'line',given:o.given,onChange:clear});
   return new Board({mode:'label',P:VIP_P,labels:['5cm','','',''],fixed:[true,false,false,false],val:'5cm',onChange:clear});
@@ -866,12 +938,13 @@ function sCheck(){
     h+=`<div class="qblock"><h3>② 테두리는 모두 몇 cm 필요할까요?</h3><div class="numline"><span class="numbox">${st.num||'&nbsp;'}</span>cm</div>${keypad('check')}</div>`;
     need=['eq'];
   }
-  const ready=need.every(q=>st.a[q])&&(o.type!=='vip'||st.num);
-  h+=`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div><div id="check-fb">${st.fb||''}</div>`;
-  const sh=ST.s.shop.recv[ST.s.shop.i];
+  const sh=ST.s.shop.recv[ST.s.shop.i],made=!!sh||st.a.made==='네';
+  if(!NET.on)h=opt('made','✏️ 만들기 담당 화면에 «🎉 주문대로 만들었어요»가 나왔나요?',['네','아직이에요'])+h;
+  const ready=made&&need.every(q=>st.a[q])&&(o.type!=='vip'||st.num);
+  h+=`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div>${made?'':'<p class="sub">✏️ 만들기 담당이 주문대로 다 만들어야 납품할 수 있어요.</p>'}<div id="check-fb">${st.fb||''}</div>`;
   if(!NET.on)return h;
   return `<div class="grid2"><div>${sh?`<div class="card board-card">${shapeFig(o,sh)}<div class="cap">✏️ 만들기 담당이 보낸 그림</div></div>`
-    :'<div class="wait">⏳ 만들기 담당이 아직 그림을 보내지 않았어요.<br>다 만들면 여기에 그림이 나타나요.<br>친구 화면을 보고 먼저 검사해도 돼요.</div>'}</div><div>${h}</div></div>`;
+    :`<div class="wait">⏳ 만들기 담당이 아직 그림을 보내지 않았어요.<br>다 만들어서 검사하기를 누르면 여기에 그림이 나타나요.<br>친구 화면을 보고 먼저 답을 골라도 돼요.</div>${st.a.made==='네'?'<p class="sub">✅ 만들기 담당 화면에서 직접 확인했어요.</p>':'<div class="row"><button class="btn ghost sm" data-act="cOpt" data-q="made" data-v="네">그림이 안 와요 · 친구 화면에서 🎉를 직접 봤어요</button></div>'}`}</div><div>${h}</div></div>`;
 }
 function sQuiz(){
   const Q=ST.s.quiz;
@@ -880,7 +953,7 @@ function sQuiz(){
   const set=QUIZ[Q.lv];
   if(Q.fin){const n=Q.first.filter(Boolean).length;
     return `<main class="wrap"><div class="card fin"><div class="big-st">${'★'.repeat(Q.lv)}</div><h1>${set.title} 끝!</h1><p class="lead">${set.qs.length}문제 중 <b>${n}문제</b>를 한 번에 맞혔어요.</p>
-    <div class="qblock"><h3>오늘 수업, 나는?</h3><div class="opts">${SELF.map(s=>`<button class="opt ${Q.self===s?'sel':''}" data-act="qSelf" data-v="${s}">${s}</button>`).join('')}</div>${Q.self?`<div class="fb ok">${NET.on?'좋아요! 선생님 화면에도 내 결과가 보여요.':'좋아요! 선생님께 화면을 보여 주세요.'}</div>`:''}</div>
+    <div class="qblock"><h3>오늘 수업, 나는?</h3><div class="opts">${SELF.map(s=>`<button class="opt ${Q.self===s?'sel':''}" data-act="qSelf" data-v="${s}">${s}</button>`).join('')}</div>${Q.self?(!NET.on||!Q.net?'<div class="fb ok">좋아요! 선생님께 화면을 보여 주세요.</div>':Q.net==='sending'?'<div class="fb tip">📨 선생님 화면으로 보내는 중이에요…</div>':Q.net==='ok'?'<div class="fb ok">좋아요! 선생님 화면에도 내 결과가 보여요.</div>':'<div class="fb no">⚠️ 선생님 화면에 못 보냈어요. 잠시 뒤 고른 답을 한 번 더 누르거나, 선생님께 화면을 보여 주세요.</div>'):''}</div>
     <div class="row center">${Q.lv<3?`<button class="btn acc big" data-act="qLv" data-l="${Q.lv+1}">${'★'.repeat(Q.lv+1)} 다음 단계 도전 →</button>`:''}<button class="btn ghost" data-act="qBack">단계 고르기</button></div></div></main>`;}
   const q=set.qs[Q.i],cls=j=>Q.sel!==j?'':Q.ok?'sel-ok':'sel-no';
   let choices;
@@ -895,12 +968,22 @@ function sQuiz(){
   const hint=!Q.ok&&Q.hint?`<div class="fb tip">💡 ${q.hint}</div>`:'';
   return `<main class="wrap"><div class="row" style="margin-top:0"><span class="prog">${'★'.repeat(Q.lv)} ${set.title} · ${Q.i+1} / ${set.qs.length}</span><button class="btn ghost sm" data-act="qBack" style="margin-left:auto">단계 고르기</button></div>
   <div class="mission"><p class="m-text">${q.t}</p>${sayBtn(q.t)}</div>${fig}${choices}
-  ${!Q.ok&&!Q.hint?'<div class="row"><button class="btn ghost" data-act="qHint">💡 힌트</button></div>':''}${hint}${fb}</main>`;
+  ${!Q.ok&&!Q.hint?'<div class="row"><button class="btn ghost" data-act="qHint">💡 힌트</button></div>':''}<div id="quiz-fb">${hint}${fb}</div></main>`;
+}
+/* 검사관 질문 ①②③의 답: 받은 그림이 있으면 그 그림으로, 없으면 주문 조건으로 정해지는 것만 */
+function checkExpect(o,sh){
+  if(sh&&sh.P){const an=analyze(sh.P);if(an.ok)return{par:an.par+'쌍',rt:an.right+'개',eq:an.allEq?'네':'아니요'};}
+  const ex={},c=o.conds;
+  if(c.includes('par1')){ex.par='1쌍';ex.eq='아니요';}
+  if(c.includes('par2')||c.includes('allEq'))ex.par='2쌍';
+  if(c.includes('noRight'))ex.rt='0개';
+  if(c.includes('allEq'))ex.eq='네';
+  return ex;
 }
 function judge(Q,ok){
   if(ok){Q.ok=true;Q.first[Q.i]=Q.wrong===0;ding('ok');}
   else{Q.wrong++;Q.hint=true;Q.num='';ding('no');}
-  render();
+  render();seeFb('quiz-fb');
 }
 
 /* ---------- 버튼 동작 ---------- */
@@ -918,10 +1001,13 @@ const ACT={
     if(T.tab==='twenty')T.tw=newTw();
     else if(T.tab==='demo'){T.demo={marks:true,name:false};if(BOARDS.tdemo)BOARDS.tdemo.P=clone(PRESET['정사각형']);}
     else if(T.tab==='table')T.table={rev:{},step:0};
-    else if(T.tab==='shop'){Object.assign(T.shop,{i:0,reveal:false,run:false,tLeft:120,prog:{}});send({t:'order',i:0});}
+    else if(T.tab==='shop'){if(!confirm('공방을 처음부터 다시 할까요?\n별과 납품 기록이 지워지고, 학생 화면의 공방도 처음으로 돌아가요.'))return;
+      Object.assign(T.shop,{i:0,reveal:false,run:false,tLeft:120,stars:0,prog:{},sep:newId()});sendOrder();}
     render();scrollTo(0,0);},
+  tNewClass(){if(!confirm('새 수업을 시작할까요?\n선생님 화면과 연결된 학생 화면의 기록이 모두 지워져요.'))return;
+    ST.t=newT();dropBoards('');sendOrder();render();scrollTo(0,0);},
   tMove(el){const i=TTABS.findIndex(x=>x[0]===ST.t.tab)+(+el.dataset.d);if(TTABS[i]){ST.t.tab=TTABS[i][0];render();scrollTo(0,0);}},
-  tSend(el){const k=el.dataset.k;send({t:'go',tab:k});if(k==='shop')send({t:'order',i:ST.t.shop.i});toast(`📱 학생 화면을 <b>${SNAME[k]}</b>(으)로 바꿨어요`,2500);},
+  tSend(el){const k=el.dataset.k;send(Object.assign(k==='shop'?{t:'go',tab:k,i:ST.t.shop.i}:{t:'go',tab:k},tag()));Object.values(ST.t.kids).forEach(x=>{x.tab=k;});toast(`📱 학생 화면을 <b>${SNAME[k]}</b>(으)로 바꿨어요`,2500);},
   sMe(){ST.s.me=null;render();scrollTo(0,0);},
   sMeSet(el){const k=el.dataset.k;ST.s.me=k;try{localStorage.setItem('sagak-me',k);}catch(_){}ding('ok');render();sendSnap(true);},
   tblStep(){const T=ST.t.table;T.step=Math.min(4,(T.step||0)+1);render();},
@@ -943,18 +1029,18 @@ const ACT={
   lineHint(){const S=ST.s.lines;S.fb=`<div class="fb tip">💡 ${LINE_M[S.i].hint}</div>`;setHTML('sline-fb',S.fb);},
   lineCheck(){const S=ST.s.lines,m=LINE_M[S.i],b=BOARDS.sline,r=lineCheck(m.given,b.ua,b.ub);
     b.checked=r.kind==='perp'||r.kind==='para';b.render();S.fb=lineFeedback(r.kind,m.target);
-    if(r.kind===m.target){S.done[S.i]=true;ding('ok');sendSnap();}else ding('no');render();},
+    if(r.kind===m.target){const fresh=!S.done[S.i];S.done[S.i]=true;ding('ok');if(fresh)sendSnap();}else ding('no');render();seeFb('sline-fb');},
   morphSel(el){const S=ST.s.morph;S.i=+el.dataset.i;S.fb='';if(BOARDS.smorph)BOARDS.smorph.P=clone(PRESET['정사각형']);render();},
   morphReset(){BOARDS.smorph.P=clone(PRESET['정사각형']);ST.s.morph.fb='';render();},
   morphMarks(){ST.s.morph.marks=!ST.s.morph.marks;render();},
   morphHint(){const S=ST.s.morph;S.fb=`<div class="fb tip">💡 ${MORPH_M[S.i].hint}</div>`;render();},
   morphCheck(){const S=ST.s.morph,m=MORPH_M[S.i],an=BOARDS.smorph.an;
     if(!an.ok){S.fb=`<div class="fb tip">⚠️ ${an.msg}</div>`;ding('no');}
-    else if(m.check(an)){S.done[S.i]=true;ding('ok');sendSnap();const fam=FAMILY[an.name];
+    else if(m.check(an)){const fresh=!S.done[S.i];S.done[S.i]=true;ding('ok');if(fresh)sendSnap();const fam=FAMILY[an.name];
       S.fb=(S.i===1&&an.name==='마름모')?'<div class="fb ok">🎉 성공! 마름모가 됐네요. 마름모도 마주 보는 두 쌍의 변이 평행해서 <b>평행사변형</b>이에요.</div>'
         :`<div class="fb ok">🎉 성공! 이 사각형의 이름은 <b>${josa(an.name,'이에요','예요')}</b>.${fam.length?`<br><span class="sub">${fam.join('·')}이기도 해요.</span>`:''}</div>`;}
     else{S.fb=`<div class="fb no">아직이에요. 지금은 평행한 변 ${an.par}쌍, 직각 ${an.right}개예요. ${lenText(an)}.</div>`;ding('no');}
-    render();},
+    render();seeFb('smorph-fb');},
   sShopGo(el){ST.s.shop.i=+el.dataset.i;render();},
   sRole(el){ST.s.shop.role=el.dataset.k||null;render();scrollTo(0,0);},
   wHl(el){const st=sst('read');st.hl[el.dataset.j]=!st.hl[el.dataset.j];el.classList.toggle('hl');},
@@ -962,10 +1048,11 @@ const ACT={
   rCheck(){const o=ORDERS[ST.s.shop.i],st=sst('read'),sel=Object.keys(st.sel).filter(k=>st.sel[k]);
     const ok=sel.length===o.conds.length&&o.conds.every(k=>st.sel[k]);st.checked=true;
     st.fb=ok?'<div class="fb ok">🎉 맞아요! 만들기 담당에게 조건을 또박또박 말해 주세요.</div>':'<div class="fb no">초록은 맞은 조건, 점선은 빠진 조건, 빨강은 주문에 없는 조건이에요. 다시 골라 봐요.</div>';
-    if(ok&&!st.sent&&NET.on){st.sent=1;send({t:'shop',step:'read',i:ST.s.shop.i,me:ST.s.me});}
-    ding(ok?'ok':'no');render();},
+    if(ok&&!st.sent&&!st.sending&&NET.on){st.sending=1;const i=ST.s.shop.i;send({t:'shop',step:'read',i,me:ST.s.me,sep:ST.s.shop.sep}).then(g=>{delete st.sending;if(g){st.sent=1;saveState();return;}
+      st.fb+='<div class="fb tip">⚠️ 선생님 화면에 못 보냈어요. 잠시 뒤 확인을 한 번 더 눌러요.</div>';if(ST.s.shop.i===i&&ST.s.shop.role==='read')setHTML('read-fb',st.fb);saveState();});}
+    ding(ok?'ok':'no');render();seeFb('read-fb');},
   bMemo(el){const st=sst('build');st.memo[el.dataset.k]=!st.memo[el.dataset.k];el.classList.toggle('sel');},
-  bReset(){delete BOARDS['build'+ST.s.shop.i];sst('build').fb='';render();},
+  bReset(){delete BOARDS['build'+ST.s.shop.i];delete SAVEDB['build'+ST.s.shop.i];const st=sst('build');st.fb='';st.base=null;render();},
   bHint(){const st=sst('build');st.fb=`<div class="fb tip">💡 ${ORDERS[ST.s.shop.i].hint}</div>`;setHTML('build-fb',st.fb);},
   bCheck(){
     const i=ST.s.shop.i,o=ORDERS[i],b=BOARDS['build'+i],st=sst('build');let ok=false,html;
@@ -975,33 +1062,49 @@ const ACT={
         html=`<div class="fb ${ok?'ok':'no'}">${ok?'🎉 주문대로 만들었어요! 검사관에게 보여 주세요.':'아직 주문과 달라요. 다시 고쳐 볼까요?'}<ul class="checks">${o.conds.map(k=>`<li>${CEVAL[k](an)?'✅':'❌'} ${COND[k][1]}</li>`).join('')}</ul><div class="sub">지금: 평행한 변 ${an.par}쌍 · 직각 ${an.right}개 · ${lenText(an)}</div></div>`;}}
     else if(o.type==='line'){const r=lineCheck(o.given,b.ua,b.ub);b.checked=r.kind==='perp'||r.kind==='para';b.render();ok=r.kind===o.target;html=lineFeedback(r.kind,o.target);}
     else{ok=b.labels.every(Boolean);html=ok?'<div class="fb ok">🎉 네 변이 모두 5cm예요! 검사관이 테두리 길이를 계산해요.</div>':"<div class=\"fb no\">아직 '?'인 변이 있어요. 마름모는 네 변의 길이가 어떤가요?</div>";}
+    const base=html,show=h=>{if(st.base!==base)return;st.fb=base+h;if(ST.s.shop.i===i&&ST.s.shop.role==='build')setHTML('build-fb',st.fb);saveState();};
+    st.base=base;st.fb=html;
     if(ok&&NET.on){const sh=shapeOf(o,b),js=JSON.stringify(sh);
-      if(st.sent!==js){st.sent=js;send(Object.assign({t:'shop',step:'build',i,me:ST.s.me},sh));}
-      html+='<div class="fb tip">📨 검사관 화면과 선생님 화면으로 그림을 보냈어요.</div>';}
-    ding(ok?'ok':'no');st.fb=html;setHTML('build-fb',html);},
+      if(st.sent!==js||Date.now()-(st.sentAt||0)>5000){st.sent=js;st.sentAt=Date.now();st.fb+='<div class="fb tip">📨 그림을 보내는 중이에요…</div>';
+        send(Object.assign({t:'shop',step:'build',i,me:ST.s.me,sep:ST.s.shop.sep},sh)).then(g=>{
+          if(g)show('<div class="fb tip">📨 검사관 화면과 선생님 화면으로 그림을 보냈어요.</div>');
+          else{st.sent=null;show('<div class="fb no">⚠️ 그림을 못 보냈어요. 잠시 뒤 검사하기를 다시 누르거나, 검사관에게 화면을 직접 보여 줘요.</div>');}});}
+      else st.fb+='<div class="fb tip">📨 검사관 화면과 선생님 화면으로 그림을 보냈어요.</div>';}
+    ding(ok?'ok':'no');setHTML('build-fb',st.fb);saveState();seeFb('build-fb');},
   cOpt(el){const st=sst('check');st.a[el.dataset.q]=el.dataset.v;st.fb='';render();},
   kp(el){const ctx=el.dataset.ctx,v=el.dataset.v,obj=ctx==='check'?sst('check'):ST.s.quiz;let n=obj.num||'';
     if(v==='del')n=n.slice(0,-1);else if(n.length<3)n+=v;obj.num=n;if(ctx==='check')obj.fb='';render();},
   cSubmit(){
     const o=ORDERS[ST.s.shop.i],st=sst('check'),I=o.ins;let ok,msg;
-    if(o.type==='quad'){const nOk=I.accept.includes(st.a.name),rOk=st.a.rs===REASON[I.reason];ok=nOk&&rOk;
-      msg=ok?(st.a.name!==I.name?`🎉 납품 성공! ${josa(st.a.name,'은','는')} 마주 보는 두 쌍의 변이 평행해서 ${I.name}이기도 해요.`:'🎉 납품 성공!')
+    if(o.type==='quad'){const nOk=I.accept.includes(st.a.name),rOk=st.a.rs===REASON[I.reason];
+      const ex=checkExpect(o,ST.s.shop.recv[ST.s.shop.i]),bad=['par','rt','eq'].find(q=>ex[q]&&st.a[q]!==ex[q]);
+      ok=!bad&&nOk&&rOk;
+      if(bad)msg={par:'①번을 다시 살펴봐요. 마주 보는 변을 길게 늘여 보고, 만나지 않으면 평행해요.',rt:'②번을 다시 살펴봐요. 삼각자를 꼭짓점마다 대어 직각을 세어 봐요.',eq:'③번을 다시 살펴봐요. 네 변이 점 몇 칸인지 세어 봐요.'}[bad];
+      else msg=ok?(st.a.name!==I.name?`🎉 납품 성공! ${josa(st.a.name,'은','는')} 마주 보는 두 쌍의 변이 평행해서 ${I.name}이기도 해요.`:'🎉 납품 성공!')
         :(!nOk?'이름을 다시 생각해 봐요. 평행한 변이 몇 쌍인지, 네 변의 길이가 같은지 살펴봐요.':'이름은 맞았어요! 이유 카드를 다시 골라 봐요.');}
     else if(o.type==='line'){const mOk=st.a.meet===I.meet,nOk=st.a.name===I.name,rOk=st.a.rs===REASON[I.reason];ok=mOk&&nOk&&rOk;
       msg=ok?'🎉 납품 성공!':!mOk?'두 선이 어떻게 만나는지 다시 살펴봐요.':!nOk?'선의 이름을 다시 생각해 봐요.':'이유 카드를 다시 골라 봐요.';}
     else{const eOk=st.a.eq==='모두 같아요',vOk=+st.num===I.value;ok=eOk&&vOk;
       msg=ok?'🎉 VIP 납품 성공! 5 + 5 + 5 + 5 = 20, 금테는 20cm예요.':!eOk?'마름모의 네 변의 길이를 다시 생각해 봐요.':'다시 계산해 봐요. 5cm인 변이 몇 개 있나요?';}
-    if(ok){msg+=NET.on?' 📦 선생님 화면에 도착했어요.':' 손을 들어 선생님께 알려요.';
-      if(!st.sent&&NET.on){st.sent=1;send({t:'shop',step:'deliver',i:ST.s.shop.i,me:ST.s.me,name:o.type==='quad'?st.a.name:o.answer.name});}}
-    ding(ok?'ok':'no');st.fb=`<div class="fb ${ok?'ok':'no'}">${msg}</div>`;render();},
+    const i=ST.s.shop.i;
+    if(ok&&!NET.on)msg+=' 손을 들어 선생님께 알려요.';
+    else if(ok&&st.sent)msg+=' 📦 이미 선생님 화면으로 보냈어요.';
+    else if(ok&&st.sending)msg+=' 📦 선생님 화면으로 보내는 중이에요…';
+    else if(ok){const base=msg;msg+=' 📦 선생님 화면으로 보내는 중이에요…';st.sending=1;
+      send({t:'shop',step:'deliver',i,me:ST.s.me,sep:ST.s.shop.sep,name:o.type==='quad'?st.a.name:o.answer.name}).then(g=>{
+        delete st.sending;if(g)st.sent=1;
+        st.fb=g?`<div class="fb ok">${base} 📦 선생님 화면으로 보냈어요.</div>`:`<div class="fb ok">${base}</div><div class="fb no">⚠️ 선생님 화면에 못 보냈어요. 잠시 뒤 납품하기를 다시 누르거나, 손을 들어 알려요.</div>`;
+        if(ST.s.shop.i===i&&ST.s.shop.role==='check')setHTML('check-fb',st.fb);saveState();});}
+    ding(ok?'ok':'no');st.fb=`<div class="fb ${ok?'ok':'no'}">${msg}</div>`;render();seeFb('check-fb');},
   qLv(el){ST.s.quiz={lv:+el.dataset.l,i:0,first:[],wrong:0,sel:null,ok:false,num:'',fin:false,self:null,hint:false};render();scrollTo(0,0);},
   qPick(el){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok)return;const v=+el.dataset.i;Q.sel=v;judge(Q,v===q.ans);},
   qNum(){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok||!Q.num)return;judge(Q,+Q.num===q.ans);},
   qHint(){ST.s.quiz.hint=true;render();},
   qNext(){const Q=ST.s.quiz;Q.i++;Object.assign(Q,{wrong:0,sel:null,ok:false,num:'',hint:false});
-    if(Q.i>=QUIZ[Q.lv].qs.length){Q.fin=true;ST.s.qres[Q.lv]={n:Q.first.filter(Boolean).length,self:null};sendSnap();}
+    if(Q.i>=QUIZ[Q.lv].qs.length){Q.fin=true;ST.s.qres[Q.lv]={n:Q.first.filter(Boolean).length,self:null};sendSnap(false,5000);}
     render();scrollTo(0,0);},
-  qSelf(el){const Q=ST.s.quiz;Q.self=el.dataset.v;if(ST.s.qres[Q.lv])ST.s.qres[Q.lv].self=Q.self;sendSnap();render();},
+  qSelf(el){const Q=ST.s.quiz;if(Q.self===el.dataset.v&&Q.net!=='fail')return;Q.self=el.dataset.v;if(ST.s.qres[Q.lv])ST.s.qres[Q.lv].self=Q.self;
+    if(NET.on){Q.net='sending';sendSnap(false,50,g=>{Q.net=g?'ok':'fail';softRender();});}render();},
   qBack(){ST.s.quiz={lv:null};render();scrollTo(0,0);},
 };
 
@@ -1009,9 +1112,10 @@ const ACT={
 function render(){
   const r=location.hash.slice(1);
   if(r==='t'||r==='s')netStart();
-  document.body.className=r==='t'?'teacher':r==='s'?'student':'home';
+  document.body.className=r==='t'?'teacher':r==='s'?'student':'home';document.body.style.minHeight='';
   $('#app').innerHTML=r==='t'?teacherView():r==='s'?studentView():homeView();
   document.querySelectorAll('[data-board]').forEach(s=>{const b=BOARDS[s.dataset.board];if(b)s.appendChild(b.svg);});
+  saveState();
 }
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const fn=ACT[el.dataset.act];if(fn)fn(el,e);});
 window.addEventListener('hashchange',()=>{render();scrollTo(0,0);});
