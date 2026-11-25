@@ -704,7 +704,7 @@ function onNet(d){
   if(r==='#t'){
     const T=ST.t;
     if(d.t==='snap'&&AV[d.me]){
-      const q={};[1,2,3].forEach(l=>{const x=d.quiz&&d.quiz[l];if(x&&Number.isInteger(x.n))q[l]={n:Math.max(0,Math.min(x.n,QUIZ[l].qs.length)),of:QUIZ[l].qs.length,self:SELF.includes(x.self)?x.self:null};});
+      const q={};if(d.quiz&&d.quiz[0]&&d.quiz[0].done)q[0]={done:1};[1,2,3].forEach(l=>{const x=d.quiz&&d.quiz[l];if(x&&Number.isInteger(x.n))q[l]={n:Math.max(0,Math.min(x.n,QUIZ[l].qs.length)),of:QUIZ[l].qs.length,self:SELF.includes(x.self)?x.self:null};});
       const arr=(a,max)=>Array.isArray(a)?a.filter(n=>okI(n,max)):[];
       if(d.ep&&d.ep!==T.ep){sendOrder(true);return;}
       const old=d.ep===T.ep?T.kids[d.me]:null,uni=(a,b)=>[...new Set([...(a||[]),...b])].sort();
@@ -857,7 +857,7 @@ function tKids(){
   const K=ST.t.kids;
   return `<main class="wrap"><h1>확인 문제 · 학생 현황</h1><p class="lead">${NET.on?'학생이 문제를 풀면 결과가 여기에 바로 모여요. 숫자는 한 번에 맞힌 문제 수예요.':'학생 화면과 연결되어 있지 않아요. 학생 아이패드 화면을 직접 확인해 주세요.'}</p>
   <div class="kids">${[1,2,3].map(n=>{const k=K[n];return `<div class="card kid ${k?'':'off'}"><div class="kid-h"><span class="kid-em">${avc(n)}</span><b>${n}번</b><span class="sub">${k?(SNAME[k.tab]||'')+' 하는 중':'아직 연결 안 됨'}</span></div>
-  <ul class="kid-l"><li>① 수직·평행 <b>${k?k.lines.length:0} / ${LINE_M.length}</b></li><li>② 변신 사각형 <b>${k?k.morph.length:0} / ${MORPH_M.length}</b></li>
+  <ul class="kid-l"><li>✏️ 연습 문제 <b>${k&&k.quiz[0]?'했어요 ✅':'–'}</b></li><li>① 수직·평행 <b>${k?k.lines.length:0} / ${LINE_M.length}</b></li><li>② 변신 사각형 <b>${k?k.morph.length:0} / ${MORPH_M.length}</b></li>
   ${[1,2,3].map(l=>{const q=k&&k.quiz[l];return `<li><span class="stc">${'★'.repeat(l)}</span> ${QUIZ[l].title} <b>${q?`${q.n} / ${q.of}`:'–'}</b>${q&&q.self?`<div class="self">${q.self}</div>`:''}</li>`;}).join('')}</ul></div>`;}).join('')}</div>
   <div class="row gap-top"><button class="btn ghost sm" data-act="tNewClass">🆕 새 수업 시작 (모든 기록 지우기)</button><span class="sub">리허설을 한 뒤, 실제 수업 전에 한 번 눌러요.</span></div></main>`;
 }
@@ -1119,7 +1119,7 @@ const ACT={
   qNum(){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok||!Q.num)return;judge(Q,+Q.num===q.ans);},
   qHint(){ST.s.quiz.hint=true;render();},
   qNext(){const Q=ST.s.quiz;Q.i++;Object.assign(Q,{wrong:0,sel:null,ok:false,num:'',hint:false});
-    if(Q.i>=QUIZ[Q.lv].qs.length&&Q.lv===0)Q.fin=true;
+    if(Q.i>=QUIZ[Q.lv].qs.length&&Q.lv===0){Q.fin=true;if(!ST.s.qres[0]){ST.s.qres[0]={done:1};sendSnap();}}
     else if(Q.i>=QUIZ[Q.lv].qs.length){Q.fin=true;ST.s.qres[Q.lv]={n:Q.first.filter(Boolean).length,self:null};sendSnap(false,5000);}
     render();scrollTo(0,0);},
   qSelf(el){const Q=ST.s.quiz;if(Q.self===el.dataset.v&&Q.net!=='fail')return;Q.self=el.dataset.v;if(ST.s.qres[Q.lv])ST.s.qres[Q.lv].self=Q.self;
