@@ -781,7 +781,7 @@ function tTwenty(){
   const status=S.won?'🎉 정답! 비밀 도형은 <b>정사각형</b>이에요!':(S.msg?S.msg+' · ':'')+`질문 ${S.asked.length}번 · 남은 도형 ${S.hide?'?':remain}개`;
   return `<main class="wrap"><h1>비밀 도형을 찾아라!</h1><p class="lead">선생님 마음속에 도형이 하나 있어요. 질문 카드를 골라 선생님께 물어보세요. 선생님은 "네", "아니요"로만 대답해요. 답을 알 것 같으면 "○○인가요?" 하고 물어보세요.</p>
   <div class="cands">${cands}</div>
-  <div class="tqs">${TQ.map(q=>{const used=S.asked.includes(q.k),yes=!!sec.p[q.k];return `<button class="tq ${used?'used':''}" data-act="twAsk" data-k="${q.k}" ${used||S.won?'disabled':''}><small>선생님,</small><span>${q.q}</span>${used?`<span class="tq-a ${yes?'':'no'}">${yes?'네! ⭕':'아니요! ✕'}</span>`:''}</button>`;}).join('')}</div>
+  <div class="tqs">${TQ.map(q=>{const used=S.asked.includes(q.k),yes=!!sec.p[q.k];return `<button class="tq ${used?'used':''}" data-act="twAsk" data-k="${q.k}" ${used||S.won?'disabled':''}><span>${q.q}</span>${used?`<span class="tq-a ${yes?'':'no'}">${yes?'네! ⭕':'아니요! ✕'}</span>`:''}</button>`;}).join('')}</div>
   <div class="tw-status">${status}</div>
   <div class="row center">${S.won&&!S.reveal?'<button class="btn acc big" data-act="twReveal">정사각형의 비밀 보기 →</button>':''}${S.won?'':`<button class="btn ghost" data-act="twHide">${S.hide?'👀 보기 보이기':'🙈 보기 가리기'}</button>`}</div>
   ${S.reveal?secretPanel():''}</main>`;
