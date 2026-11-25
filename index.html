@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>사각형 공방 · 여러 가지 사각형</title>
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--ink:#1d2129;--sub:#5d636b;--line:#e4dfd4;--perp:#e5484d;--par1:#2f6fed;--par2:#13976a;--eq:#e08600;--acc:#5b3fd0;--acc-soft:#efe9ff;--ok:#13976a;--no:#d64545}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;font-size:18px;line-height:1.5;-webkit-text-size-adjust:100%;word-break:keep-all;overflow-wrap:break-word}
+body.teacher{font-size:21px}
+button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{cursor:default}
+a{color:inherit}
+h1{font-size:1.65em;line-height:1.25;margin:.15em 0;letter-spacing:-.02em}
+.lead{color:var(--sub);margin:.2em 0 1em}
+.sub{color:var(--sub);font-size:.92em;margin:8px 2px}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{font-weight:800;text-decoration:none;margin-right:8px;white-space:nowrap}
+.tabs{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{border:0;background:none;padding:9px 13px;border-radius:12px;color:var(--sub);white-space:nowrap;font-weight:700;font-size:.95em}
+.tab.on{background:var(--ink);color:#fff}
+.who{margin-left:auto;color:var(--sub);font-size:.8em;white-space:nowrap;padding-left:8px}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 18px 70px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.btn{border:0;border-radius:14px;padding:11px 20px;background:var(--ink);color:#fff;font-weight:700;min-height:50px}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.acc{background:var(--acc)}
+.btn.big{font-size:1.12em;padding:14px 26px;min-height:58px}
+.btn.sm{min-height:42px;padding:8px 14px;font-size:.9em}
+.btn:disabled{opacity:.35}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.center{justify-content:center}
+.grid2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.board{display:block;width:100%;height:auto;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.board-card{padding:6px}
+.board-card .board{max-height:calc(100vh - 120px)}
+.gap-top{margin-top:12px}
+.info{display:flex;flex-direction:column;gap:8px;margin:4px 0 10px}
+.badge{padding:10px 14px;border-radius:12px;border:1.5px solid;font-weight:600}
+.badge b{font-weight:800}
+.badge.par{border-color:#c6d6fb;background:#f1f5ff}
+.badge.perp{border-color:#f5c6c7;background:#fff3f3}
+.badge.eq{border-color:#f3d6a2;background:#fff8ec}
+.name-box{font-size:1.55em;font-weight:800;padding:12px 16px;border-radius:14px;background:var(--acc-soft);color:var(--acc);line-height:1.3}
+.name-box small{display:block;font-size:.5em;font-weight:600;color:var(--sub);margin-top:2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--sub);font-size:.85em;margin-top:6px}
+.lg{display:inline-block;width:13px;height:13px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.lg.r{background:var(--perp)}.lg.b{background:var(--par1)}.lg.o{background:var(--eq)}
+.fb{padding:13px 16px;border-radius:14px;margin:10px 0;font-weight:600}
+.fb.ok{background:#e5f5ee;color:#0b6646}
+.fb.no{background:#fdeeee;color:#a32b2b}
+.fb.tip{background:#fff5d8;color:#6f5200}
+.checks{margin:8px 0 4px;padding:0;list-style:none}
+.checks li{margin:2px 0}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* home */
+body.home{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 15% 10%,#ebe4ff,transparent 45%),radial-gradient(circle at 90% 90%,#e3eeff,transparent 40%),var(--bg)}
+.home-card{max-width:760px;padding:30px 22px;text-align:center}
+.kicker{color:var(--acc);font-weight:800}
+.home-card h1{font-size:3em;margin:.15em 0}
+.home-btns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.big{display:block;text-decoration:none;background:#fff;border:2px solid var(--ink);border-radius:22px;padding:28px 18px;font-size:1.4em;font-weight:800}
+.big small{display:block;font-size:.6em;color:var(--sub);font-weight:600;margin-top:6px}
+/* twenty */
+.cands{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:12px 0 20px}
+@media (max-width:900px){.cands{grid-template-columns:repeat(3,1fr)}}
+.cand{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px;text-align:center;transition:all .6s}
+.cand-svg{width:100%;display:block}
+.cand-svg *{fill:var(--acc-soft);stroke:var(--acc);stroke-width:3;stroke-linejoin:round}
+.cand-l{font-weight:800;margin-top:6px}
+.cand.out{opacity:.22;transform:scale(.9);filter:grayscale(1)}
+.cand.out::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4em;color:var(--no);font-weight:900}
+.cand.win{border-color:var(--acc);box-shadow:0 0 0 6px var(--acc-soft);transform:scale(1.05)}
+.tqs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tq{border:2px solid var(--ink);background:#fff;border-radius:18px;padding:16px;font-size:1.12em;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px}
+.tq.used{background:var(--ink);color:#fff}
+.tq:disabled:not(.used){opacity:.35}
+.tq-a{font-size:.95em;color:#ffd166}
+.tw-status{text-align:center;font-size:1.3em;font-weight:800;margin:18px 0 4px}
+.secret{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:26px;align-items:center;margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+@media (max-width:900px){.secret{grid-template-columns:1fr}}
+.secret-fig svg{width:100%;display:block}
+.ext{stroke:var(--par1);stroke-width:.05;stroke-dasharray:.16 .12}
+.sec-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;animation:pop .5s both}
+.s1{animation-delay:.1s}.s2{animation-delay:.7s}.s3{animation-delay:1.3s}.s4{animation-delay:1.8s}
+.dot{width:18px;height:18px;border-radius:50%;flex:none;margin-top:6px}
+.dot.red{background:var(--perp)}.dot.blue{background:var(--par1)}
+b.red{color:var(--perp)} b.blue{color:var(--par1)}
+.goal{background:var(--acc-soft);border-radius:16px;padding:14px 18px;margin:8px 0;animation:pop .5s both}
+.teaser{color:var(--sub);margin-top:8px;animation:pop .5s both}
+/* table */
+.ftable{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:18px;overflow:hidden;border:1px solid var(--line)}
+.ftable th,.ftable td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.ftable tr:last-child td{border-bottom:0}
+.ftable th{background:#faf8f3;font-size:.85em;color:var(--sub)}
+.ftable tr.start td{background:#fbfaff}
+.nm-in{display:flex;align-items:center;gap:12px;font-weight:800;text-align:left}
+.nm-in svg{width:110px;height:76px;flex:none}
+.nm-in small{display:block;font-size:.7em;color:var(--acc);font-weight:700}
+.cell{border:2px dashed #cfc7b6;background:#fffdf8;border-radius:12px;padding:10px 12px;min-width:120px;width:100%;font-weight:800;color:var(--sub)}
+.cell.rev{border:2px solid transparent;background:var(--acc-soft);color:var(--ink)}
+.cell:disabled{opacity:1;color:var(--ink)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px}
+.chain .c{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:7px 16px;font-weight:800}
+.chain .arr{color:var(--sub);font-size:.85em;font-weight:700}
+/* shop */
+.shop{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.shop{grid-template-columns:1fr}}
+.order{text-align:center;padding:24px}
+.who-em{font-size:5em;line-height:1.1}
+.who-name{color:var(--sub);font-weight:800;margin:6px 0 12px}
+.bubble{background:var(--ink);color:#fff;border-radius:22px;padding:20px 24px;font-size:1.25em;font-weight:700;text-align:left;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700}
+.ic{display:inline-block;min-width:1.4em;color:var(--acc);font-weight:900;margin-right:4px}
+.onum{display:flex;gap:8px;flex-wrap:wrap}
+.onum button{width:54px;height:54px;border-radius:14px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:1.1em}
+.onum button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stars{font-size:1.6em;min-height:1.6em;letter-spacing:2px}
+.timer{font-size:2em;font-weight:800;font-variant-numeric:tabular-nums;min-width:3.2em}
+.stars .sub{font-size:.55em;letter-spacing:0}
+.ans{margin-top:14px;animation:pop .4s both}
+.ans-fig svg{width:100%;max-height:300px;display:block}
+/* student */
+.mission-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mt{border:2px solid var(--line);background:#fff;border-radius:14px;padding:9px 15px;font-weight:800;min-height:50px}
+.mt .st-s{color:#f2a900}
+.mt.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.mt.done::after{content:' ✓';color:var(--ok)}
+.mt.on.done::after{color:#8ff0c6}
+.mission{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.m-text{flex:1;margin:0;font-size:1.22em;font-weight:700}
+.say{border:0;background:var(--acc-soft);border-radius:12px;width:52px;height:52px;font-size:1.35em;flex:none}
+.who-sm{font-size:2.4em;flex:none}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:700px){.roles{grid-template-columns:1fr}}
+.role{border:2px solid var(--line);background:#fff;border-radius:20px;padding:22px 14px;text-align:center}
+.role .em{font-size:3em}
+.role b{display:block;font-size:1.2em;margin:6px 0}
+.role span{color:var(--sub);font-size:.9em}
+.role-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.role-tag{font-size:1.25em;font-weight:800}
+.words{flex:1;font-size:1.38em;font-weight:700;line-height:2}
+.w{border:0;background:none;padding:2px 2px;border-radius:6px;font-weight:700}
+.w.hl{background:linear-gradient(transparent 55%,#ffe066 55%)}
+.pool{display:flex;flex-wrap:wrap;gap:10px}
+.pchip{border:2px solid var(--line);background:#fff;border-radius:14px;padding:11px 15px;font-weight:700;min-height:52px}
+.pchip.sel{border-color:var(--acc);background:var(--acc-soft);color:var(--acc)}
+.pchip.good{border-color:var(--ok);background:#e5f5ee;color:#0b6646}
+.pchip.miss{border-style:dashed;border-color:var(--eq);background:#fff8ec}
+.pchip.bad{border-color:var(--no);background:#fdeeee;color:#a32b2b}
+.qblock{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.qblock h3{margin:0 0 10px;font-size:1.08em}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts.col{flex-direction:column;align-items:stretch;margin-top:12px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:14px;padding:11px 16px;font-weight:700;min-height:52px;text-align:left}
+.opt.sel{border-color:var(--ink);background:var(--ink);color:#fff}
+.opt.sel-ok,.pic.sel-ok{border-color:var(--ok);background:#e5f5ee;color:#0b6646}
+.opt.sel-no,.pic.sel-no{border-color:var(--no);background:#fdeeee;color:#a32b2b}
+.picgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.picgrid.three{grid-template-columns:repeat(3,1fr)}
+.pic{border:3px solid var(--line);background:#fff;border-radius:18px;padding:8px}
+.pic svg{width:100%;height:auto;display:block}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:330px;width:100%}
+.keypad button{height:60px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-size:1.4em;font-weight:800}
+.kp-wrap{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-top:10px}
+.numline{font-size:1.3em;font-weight:800;margin:12px 0 4px}
+.numbox{font-size:1.6em;font-weight:800;border-bottom:3px solid var(--ink);min-width:3ch;display:inline-block;text-align:center;margin-right:6px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:700px){.levels{grid-template-columns:1fr}}
+.lvl{border:2px solid var(--line);background:#fff;border-radius:20px;padding:24px 14px;text-align:center}
+.lvl .st{font-size:1.8em;color:#f2a900;letter-spacing:2px}
+.lvl b{display:block;font-size:1.15em;margin:6px 0}
+.lvl span{color:var(--sub);font-size:.9em}
+.prog{color:var(--sub);font-weight:800}
+.qfig{max-width:420px;margin:12px auto 0}
+.qfig svg{width:100%;display:block}
+.fin{text-align:center;max-width:720px;margin:0 auto}
+.fin .opts{justify-content:center}
+.big-st{font-size:2.4em;color:#f2a900;letter-spacing:4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* ---------- 기본 도구 ---------- */
+const NS='http://www.w3.org/2000/svg';
+const C={perp:'#e5484d',par1:'#2f6fed',par2:'#13976a',eq:'#e08600',acc:'#5b3fd0',ink:'#1d2129'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const setHTML=(id,h)=>{const e=document.getElementById(id);if(e)e.innerHTML=h;};
+const f=n=>Math.round(n*1000)/1000;
+const pts=a=>a.map(p=>Array.isArray(p)?{x:p[0],y:p[1]}:{x:p.x,y:p.y});
+const clone=P=>P.map(p=>({x:p.x,y:p.y}));
+const sub=(a,b)=>({x:a.x-b.x,y:a.y-b.y});
+const add=(a,b)=>({x:a.x+b.x,y:a.y+b.y});
+const cross=(u,v)=>u.x*v.y-u.y*v.x;
+const dot=(u,v)=>u.x*v.x+u.y*v.y;
+const len2=u=>u.x*u.x+u.y*u.y;
+const eqp=(a,b)=>a.x===b.x&&a.y===b.y;
+const mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+const unit=v=>{const l=Math.hypot(v.x,v.y)||1;return{x:v.x/l,y:v.y/l};};
+const Lseg=(a,b,c,d)=>({a:{x:a,y:b},b:{x:c,y:d}});
+function josa(w,a,b){const c=w.charCodeAt(w.length-1);return w+((c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28)?a:b);}
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+
+let actx=null;
+function ding(kind){
+  try{
+    actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();
+    const N={ok:[660,880],bell:[784,988,1319],no:[330,247]}[kind]||[660];
+    N.forEach((fr,i)=>{const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime+i*.12;
+      o.type=kind==='no'?'triangle':'sine';o.frequency.value=fr;
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.32);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+.36);});
+  }catch(_){}
+}
+function speak(t){
+  try{const s=window.speechSynthesis;if(!s)return;s.cancel();
+    const txt=t.replace(/\(\s*\)/g,'빈칸').replace(/cm²/g,'제곱센티미터').replace(/cm/g,'센티미터').replace(/(\d)m/g,'$1미터').replace(/×/g,'곱하기');
+    const u=new SpeechSynthesisUtterance(txt);u.lang='ko-KR';u.rate=.9;s.speak(u);}catch(_){}
+}
+
+/* ---------- 사각형 판별 ---------- */
+function orient(a,b,c){return Math.sign(cross(sub(b,a),sub(c,a)));}
+function onSeg(a,b,c){return Math.min(a.x,b.x)<=c.x&&c.x<=Math.max(a.x,b.x)&&Math.min(a.y,b.y)<=c.y&&c.y<=Math.max(a.y,b.y);}
+function segCross(p1,p2,p3,p4){
+  const d1=orient(p3,p4,p1),d2=orient(p3,p4,p2),d3=orient(p1,p2,p3),d4=orient(p1,p2,p4);
+  if(d1*d2<0&&d3*d4<0)return true;
+  return (d1===0&&onSeg(p3,p4,p1))||(d2===0&&onSeg(p3,p4,p2))||(d3===0&&onSeg(p1,p2,p3))||(d4===0&&onSeg(p1,p2,p4));
+}
+function analyze(P){
+  const S=[0,1,2,3].map(i=>sub(P[(i+1)%4],P[i]));
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)if(eqp(P[i],P[j]))return{ok:false,msg:'꼭짓점 두 개가 같은 점에 있어요.'};
+  for(let i=0;i<4;i++)if(cross(S[i],S[(i+1)%4])===0)return{ok:false,msg:'꼭짓점 세 개가 한 줄에 있어요. 사각형이 아니에요!'};
+  if(segCross(P[0],P[1],P[2],P[3])||segCross(P[1],P[2],P[3],P[0]))return{ok:false,msg:'변이 서로 엇갈렸어요. 꼭짓점을 다시 옮겨 보세요.'};
+  const parA=cross(S[0],S[2])===0,parB=cross(S[1],S[3])===0,par=(parA?1:0)+(parB?1:0);
+  const rightAt=[0,1,2,3].map(i=>dot(S[(i+3)%4],S[i])===0),right=rightAt.filter(Boolean).length;
+  const L=S.map(len2),allEq=L.every(v=>v===L[0]),oppEq=L[0]===L[2]&&L[1]===L[3];
+  let name;
+  if(par===2)name=right===4?(allEq?'정사각형':'직사각형'):(allEq?'마름모':'평행사변형');
+  else name=par===1?'사다리꼴':'사각형';
+  return{ok:true,S,L,parA,parB,par,rightAt,right,allEq,oppEq,name};
+}
+const FAMILY={'정사각형':['직사각형','마름모','평행사변형','사다리꼴'],'직사각형':['평행사변형','사다리꼴'],'마름모':['평행사변형','사다리꼴'],'평행사변형':['사다리꼴'],'사다리꼴':[],'사각형':[]};
+function lenText(an){
+  if(an.allEq)return'네 변의 길이가 모두 같아요';
+  if(an.oppEq)return'마주 보는 변끼리 길이가 같아요';
+  const L=an.L;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)if(L[i]===L[j])return'길이가 같은 변이 있어요';
+  return'네 변의 길이가 모두 달라요';
+}
+
+/* ---------- 그리기 ---------- */
+function chev(m,d,n,col){
+  const u=unit(d),q={x:-u.y,y:u.x};let s='';
+  for(let k=0;k<n;k++){const o=(k-(n-1)/2)*.2,c={x:m.x+u.x*o,y:m.y+u.y*o};
+    s+=`<polyline points="${f(c.x-u.x*.12+q.x*.15)},${f(c.y-u.y*.12+q.y*.15)} ${f(c.x+u.x*.08)},${f(c.y+u.y*.08)} ${f(c.x-u.x*.12-q.x*.15)},${f(c.y-u.y*.12-q.y*.15)}" fill="none" stroke="${col}" stroke-width=".07" stroke-linecap="round" stroke-linejoin="round"/>`;}
+  return s;
+}
+function rmark(V,A,B,a){
+  a=a||.32;const u=unit(sub(A,V)),w=unit(sub(B,V));
+  const p1={x:V.x+u.x*a,y:V.y+u.y*a},p3={x:V.x+w.x*a,y:V.y+w.y*a},p2={x:p1.x+w.x*a,y:p1.y+w.y*a};
+  return `<polygon points="${f(V.x)},${f(V.y)} ${f(p1.x)},${f(p1.y)} ${f(p2.x)},${f(p2.y)} ${f(p3.x)},${f(p3.y)}" fill="rgba(229,72,77,.18)"/><polyline points="${f(p1.x)},${f(p1.y)} ${f(p2.x)},${f(p2.y)} ${f(p3.x)},${f(p3.y)}" fill="none" stroke="${C.perp}" stroke-width=".06"/>`;
+}
+function ticks(a,b,n){
+  const d=sub(b,a),u=unit(d),q={x:-u.y,y:u.x},c={x:a.x+d.x*.27,y:a.y+d.y*.27};let s='';
+  for(let k=0;k<n;k++){const o=(k-(n-1)/2)*.1,p={x:c.x+u.x*o,y:c.y+u.y*o};
+    s+=`<line x1="${f(p.x+q.x*.16)}" y1="${f(p.y+q.y*.16)}" x2="${f(p.x-q.x*.16)}" y2="${f(p.y-q.y*.16)}" stroke="${C.eq}" stroke-width=".065" stroke-linecap="round"/>`;}
+  return s;
+}
+function quadSVG(P,an,o){
+  o=o||{};const marks=!!o.marks&&an.ok;
+  let s=`<polygon points="${P.map(p=>p.x+','+p.y).join(' ')}" fill="rgba(91,63,208,.10)"/>`;
+  for(let i=0;i<4;i++){const a=P[i],b=P[(i+1)%4];let col=C.ink;
+    if(marks){if(i%2===0&&an.parA)col=C.par1;if(i%2===1&&an.parB)col=C.par2;}
+    s+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${col}" stroke-width=".09" stroke-linecap="round"/>`;}
+  if(marks){
+    [[0,an.parA,1,C.par1],[1,an.parB,2,C.par2]].forEach(([i,on,n,col])=>{if(!on)return;const ref=an.S[i];
+      [i,i+2].forEach(k=>{let d=an.S[k];if(dot(d,ref)<0)d={x:-d.x,y:-d.y};s+=chev(mid(P[k],P[(k+1)%4]),d,n,col);});});
+    an.rightAt.forEach((r,i)=>{if(r)s+=rmark(P[i],P[(i+3)%4],P[(i+1)%4]);});
+    const g={};an.L.forEach((l,i)=>{(g[l]=g[l]||[]).push(i);});
+    let n=0;Object.values(g).filter(a=>a.length>1).forEach(arr=>{n++;arr.forEach(k=>{s+=ticks(P[k],P[(k+1)%4],n);});});
+  }
+  return s;
+}
+function labelsSVG(P,labels,fixed){
+  const c={x:P.reduce((s,p)=>s+p.x,0)/4,y:P.reduce((s,p)=>s+p.y,0)/4};let s='';
+  P.forEach((a,i)=>{const b=P[(i+1)%4],m=mid(a,b),u=unit(sub(b,a));let n={x:-u.y,y:u.x};if(dot(n,sub(m,c))<0)n={x:-n.x,y:-n.y};
+    const t={x:m.x+n.x*.62,y:m.y+n.y*.62},v=labels[i];
+    if(v)s+=`<text x="${f(t.x)}" y="${f(t.y)}" font-size=".5" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="${fixed&&fixed[i]?C.ink:C.acc}">${v}</text>`;
+    else s+=`<circle cx="${f(t.x)}" cy="${f(t.y)}" r=".34" fill="${C.acc}" opacity=".14"/><text x="${f(t.x)}" y="${f(t.y)}" font-size=".46" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="${C.acc}">?</text>`;});
+  return s;
+}
+function longLine(a,b,col,sw,dash){const d=sub(b,a);return `<line x1="${f(a.x-d.x*40)}" y1="${f(a.y-d.y*40)}" x2="${f(a.x+d.x*40)}" y2="${f(a.y+d.y*40)}" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"${dash?' stroke-dasharray=".2 .15" opacity=".6"':''}/>`;}
+function lineX(a,b,c,d){const r=sub(b,a),s=sub(d,c),den=cross(r,s);if(!den)return null;const t=cross(sub(c,a),s)/den;return{x:a.x+r.x*t,y:a.y+r.y*t};}
+function lineSVG(g,ua,ub,res){
+  let s=longLine(g.a,g.b,C.ink,.1);
+  if(ua&&ub){s+=longLine(ua,ub,C.par1,.05,true);s+=`<line x1="${ua.x}" y1="${ua.y}" x2="${ub.x}" y2="${ub.y}" stroke="${C.par1}" stroke-width=".11" stroke-linecap="round"/>`;}
+  if(ua)s+=`<circle cx="${ua.x}" cy="${ua.y}" r=".2" fill="${C.par1}"/>`;
+  if(ub)s+=`<circle cx="${ub.x}" cy="${ub.y}" r=".2" fill="${C.par1}"/>`;
+  if(res==='perp'&&ua&&ub){const X=lineX(g.a,g.b,ua,ub);if(X)s+=rmark(X,add(X,sub(g.b,g.a)),add(X,sub(ub,ua)),.42);}
+  if(res==='para'&&ua&&ub){const d=sub(g.b,g.a);let e=sub(ub,ua);if(dot(d,e)<0)e={x:-e.x,y:-e.y};s+=chev(mid(g.a,g.b),d,2,C.ink)+chev(mid(ua,ub),e,2,C.par1);}
+  return s;
+}
+function lineCheck(g,ua,ub){
+  if(!ua||!ub)return{kind:'none'};
+  const d=sub(g.b,g.a),e=sub(ub,ua);
+  if(cross(d,e)===0)return{kind:cross(d,sub(ua,g.a))===0?'same':'para'};
+  return{kind:dot(d,e)===0?'perp':'other'};
+}
+function figSVG(Parr,o){
+  o=o||{};const P=pts(Parr);let x0,y0,w,h;
+  if(o.box){[x0,y0,w,h]=o.box;}
+  else{const pad=o.pad!=null?o.pad:.9,xs=P.map(p=>p.x),ys=P.map(p=>p.y);x0=Math.min(...xs)-pad;y0=Math.min(...ys)-pad;w=Math.max(...xs)-Math.min(...xs)+2*pad;h=Math.max(...ys)-Math.min(...ys)+2*pad;}
+  let s='';
+  if(o.grid!==false)for(let y=Math.ceil(y0);y<=y0+h;y++)for(let x=Math.ceil(x0);x<=x0+w;x++)s+=`<circle cx="${x}" cy="${y}" r=".07" fill="#c4bcac"/>`;
+  s+=quadSVG(P,analyze(P),{marks:o.marks});
+  if(o.labels)s+=labelsSVG(P,o.labels,o.labels.map(Boolean));
+  return `<svg viewBox="${f(x0)} ${f(y0)} ${f(w)} ${f(h)}" xmlns="${NS}">${s}</svg>`;
+}
+function figLinesSVG(g,l,o){
+  o=o||{};const cols=o.cols||7,rows=o.rows||5;let s='';
+  for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)s+=`<circle cx="${x}" cy="${y}" r=".07" fill="#c4bcac"/>`;
+  s+=lineSVG(g,l.a,l.b,o.mark||null);
+  return `<svg viewBox="-0.6 -0.6 ${cols+.2} ${rows+.2}" xmlns="${NS}">${s}</svg>`;
+}
+
+/* ---------- 점판 ---------- */
+class Board{
+  constructor(o){
+    Object.assign(this,{cols:11,rows:8,mode:'quad',showMarks:true,locked:false,onChange:null,checked:false,ua:null,ub:null},o);
+    if(this.P)this.P=pts(this.P);
+    if(this.labels)this.labels=this.labels.slice();
+    const svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('viewBox',`-0.7 -0.7 ${this.cols+.4} ${this.rows+.4}`);
+    svg.setAttribute('class','board');
+    this.svg=svg;this.drag=null;
+    svg.addEventListener('pointerdown',e=>this.down(e));
+    svg.addEventListener('pointermove',e=>this.move(e));
+    ['pointerup','pointercancel','lostpointercapture'].forEach(t=>svg.addEventListener(t,()=>{this.drag=null;}));
+    this.render();
+  }
+  pt(e){const p=this.svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(this.svg.getScreenCTM().inverse());}
+  snap(p){return{x:Math.max(0,Math.min(this.cols-1,Math.round(p.x))),y:Math.max(0,Math.min(this.rows-1,Math.round(p.y)))};}
+  changed(){if(this.onChange)this.onChange(this);}
+  down(e){
+    if(this.locked)return;
+    const p=this.pt(e);
+    if(this.mode==='quad'){
+      let best=-1,bd=.75*.75;
+      this.P.forEach((q,i)=>{const d=(q.x-p.x)**2+(q.y-p.y)**2;if(d<bd){bd=d;best=i;}});
+      if(best<0)return;
+      this.drag=best;e.preventDefault();
+      try{this.svg.setPointerCapture(e.pointerId);}catch(_){}
+    }else if(this.mode==='line'){
+      const s=this.snap(p);if((s.x-p.x)**2+(s.y-p.y)**2>.45*.45)return;
+      if(!this.ua||this.ub){this.ua=s;this.ub=null;}else if(!eqp(s,this.ua))this.ub=s;else return;
+      this.checked=false;this.render();this.changed();
+    }else if(this.mode==='label'){
+      let best=-1,bd=.8;
+      this.P.forEach((a,i)=>{const d=distSeg(p,a,this.P[(i+1)%4]);if(d<bd){bd=d;best=i;}});
+      if(best<0||this.fixed[best])return;
+      this.labels[best]=this.labels[best]?'':this.val;this.render();this.changed();
+    }
+  }
+  move(e){
+    if(this.drag==null)return;
+    const s=this.snap(this.pt(e)),cur=this.P[this.drag];
+    if(eqp(s,cur)||this.P.some((q,i)=>i!==this.drag&&eqp(q,s)))return;
+    this.P[this.drag]=s;this.checked=false;this.render();this.changed();
+  }
+  render(){
+    let s='';
+    for(let y=0;y<this.rows;y++)for(let x=0;x<this.cols;x++)s+=`<circle cx="${x}" cy="${y}" r=".075" fill="#b8b0a0"/>`;
+    if(this.mode==='quad'){
+      this.an=analyze(this.P);
+      s+=quadSVG(this.P,this.an,{marks:this.showMarks});
+      if(!this.locked)this.P.forEach(p=>{s+=`<circle cx="${p.x}" cy="${p.y}" r=".26" fill="#fff" stroke="${C.acc}" stroke-width=".08"/>`;});
+    }else if(this.mode==='line'){
+      s+=lineSVG(this.given,this.ua,this.ub,this.checked?lineCheck(this.given,this.ua,this.ub).kind:null);
+    }else{
+      this.an=analyze(this.P);
+      s+=quadSVG(this.P,this.an,{marks:false})+labelsSVG(this.P,this.labels,this.fixed);
+    }
+    this.svg.innerHTML=s;
+  }
+}
+function distSeg(p,a,b){const ab=sub(b,a),ap=sub(p,a);let t=dot(ap,ab)/len2(ab);t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-(a.x+ab.x*t),p.y-(a.y+ab.y*t));}
+const BOARDS={};
+function board(key,make){if(!BOARDS[key])BOARDS[key]=make();return BOARDS[key];}
+
+/* ---------- 자료 ---------- */
+const PRESET={
+  '정사각형':pts([[3,1],[7,1],[7,5],[3,5]]),
+  '직사각형':pts([[2,2],[8,2],[8,5],[2,5]]),
+  '사다리꼴':pts([[1,5],[9,5],[7,2],[3,2]]),
+  '평행사변형':pts([[2,5],[6,5],[8,2],[4,2]]),
+  '마름모':pts([[2,4],[5,2],[8,4],[5,6]]),
+};
+const CANDS=[
+  {label:'삼각형',svg:'<polygon points="50,12 92,84 8,84"/>',p:{four:false,right:false,eq:true}},
+  {label:'원',svg:'<circle cx="50" cy="50" r="38"/>',p:{four:false,right:false,eq:false}},
+  {label:'오각형',svg:'<polygon points="50,8 90,37 75,85 25,85 10,37"/>',p:{four:false,right:false,eq:true}},
+  {label:'직사각형',svg:'<polygon points="6,26 94,26 94,74 6,74"/>',p:{four:true,right:true,eq:false}},
+  {label:'정사각형',svg:'<polygon points="16,16 84,16 84,84 16,84"/>',p:{four:true,right:true,eq:true},secret:true},
+  {label:'???',svg:'<polygon points="50,5 80,50 50,95 20,50"/>',p:{four:true,right:false,eq:true}},
+];
+const TQ=[{k:'four',q:'변이 4개야?'},{k:'right',q:'모든 각이 직각이야?'},{k:'eq',q:'모든 변의 길이가 같아?'}];
+const TABLE=[
+  {n:'정사각형',P:PRESET['정사각형'],c:['2쌍','네 변이 모두 같아요','네 각이 모두 직각'],start:true},
+  {n:'사다리꼴',P:PRESET['사다리꼴'],c:['한 쌍이라도 있으면 돼요','같지 않아도 돼요','없어도 돼요']},
+  {n:'평행사변형',P:PRESET['평행사변형'],c:['2쌍','마주 보는 변끼리 같아요','없어도 돼요']},
+  {n:'마름모',P:PRESET['마름모'],c:['2쌍','네 변이 모두 같아요','없어도 돼요']},
+];
+const COND={
+  perp:['⊥','수직인 선(수선)'],para:['∥','평행한 선(평행선)'],
+  par1:['∥ 1쌍','평행한 변이 딱 한 쌍'],par2:['∥ 2쌍','평행한 변이 두 쌍'],
+  noRight:['직각 ✕','직각이 없어요'],allEq:['＝×4','네 변의 길이가 모두 같아요'],
+  rhombus:['◇','마름모 모양'],side5:['5cm','한 변이 5cm'],total:['＋','네 변의 길이를 모두 더해요'],
+};
+const CEVAL={par1:an=>an.par===1,par2:an=>an.par===2,noRight:an=>an.right===0,allEq:an=>an.allEq};
+const REASON={r1:'평행한 변이 한 쌍이라도 있어요',r2:'마주 보는 두 쌍의 변이 서로 평행해요',r3:'네 변의 길이가 모두 같아요',r4:'네 각이 모두 직각이에요',l1:'두 선이 직각으로 만나요',l2:'두 선이 아무리 늘여도 만나지 않아요'};
+const VIP_P=pts([[1,6],[6,6],[9,2],[4,2]]);
+const ORDERS=[
+  {who:'🧑‍🔧',name:'목수 아저씨',type:'line',target:'perp',given:Lseg(1,5,9,5),
+   text:'책장에 선반을 달 거예요. 검은 선에 수직인 선, 수선을 그어 주세요.',
+   conds:['perp'],pool:['perp','para','allEq'],ins:{meet:'직각으로 만나요',name:'수선',reason:'l1'},
+   answer:{name:'수선',line:Lseg(5,1,5,7),reason:'두 선이 직각으로 만나요.',def:'두 직선이 만나서 이루는 각이 직각일 때 두 직선은 서로 수직이에요. 한 직선에 수직인 직선을 수선이라고 해요.'}},
+  {who:'🚂',name:'기관사',type:'line',target:'para',given:Lseg(1,6,9,2),
+   text:'기찻길을 놓아 주세요. 검은 선과 아무리 길게 늘여도 만나지 않는 선, 평행선을 그어 주세요.',
+   conds:['para'],pool:['perp','para','noRight'],ins:{meet:'만나지 않아요',name:'평행선',reason:'l2'},
+   answer:{name:'평행선',line:Lseg(1,4,7,1),reason:'두 선이 아무리 늘여도 만나지 않아요.',def:'서로 만나지 않는 두 직선을 평행하다고 해요. 평행한 두 직선을 평행선이라고 해요.'}},
+  {who:'🍰',name:'제과점 사장님',type:'quad',
+   text:'케이크 상자 옆면을 만들어 주세요. 평행한 변이 딱 한 쌍만 있는 사각형이어야 해요.',
+   conds:['par1'],pool:['par1','par2','allEq','noRight'],hint:'위쪽 꼭짓점 하나만 옆으로 옮겨 보세요.',
+   ins:{name:'사다리꼴',accept:['사다리꼴'],reason:'r1'},
+   answer:{name:'사다리꼴',P:PRESET['사다리꼴'],reason:'평행한 변이 한 쌍이라도 있어요.',def:'평행한 변이 한 쌍이라도 있는 사각형을 사다리꼴이라고 해요.'}},
+  {who:'🪟',name:'창문 가게',type:'quad',
+   text:'비스듬한 창문을 만들어 주세요. 마주 보는 두 쌍의 변이 모두 평행하고, 직각은 하나도 없어야 해요.',
+   conds:['par2','noRight'],pool:['par1','par2','allEq','noRight'],hint:'위쪽 꼭짓점 두 개를 같은 쪽으로 똑같이 옮겨 보세요.',
+   ins:{name:'평행사변형',accept:['평행사변형','마름모'],reason:'r2'},
+   answer:{name:'평행사변형',P:PRESET['평행사변형'],reason:'마주 보는 두 쌍의 변이 서로 평행해요.',def:'마주 보는 두 쌍의 변이 서로 평행한 사각형을 평행사변형이라고 해요. 마주 보는 두 변의 길이가 같아요.'}},
+  {who:'💎',name:'보석 가게',type:'quad',
+   text:'보석 모양 배지를 만들어 주세요. 네 변의 길이가 모두 같고, 직각은 하나도 없어야 해요.',
+   conds:['allEq','noRight'],pool:['par1','par2','allEq','noRight'],hint:'가운데 점을 하나 정하고, 왼쪽·오른쪽으로 3칸, 위·아래로 2칸 떨어진 곳에 꼭짓점을 놓아 보세요.',
+   ins:{name:'마름모',accept:['마름모'],reason:'r3'},
+   answer:{name:'마름모',P:PRESET['마름모'],reason:'네 변의 길이가 모두 같아요.',def:'네 변의 길이가 모두 같은 사각형을 마름모라고 해요. 마주 보는 두 쌍의 변이 서로 평행해요.'}},
+  {who:'👑',name:'VIP 손님',type:'vip',
+   text:'마름모 모양 액자에 금색 테두리를 두르려고 해요. 액자의 한 변은 5cm예요. 테두리는 모두 몇 cm 필요할까요?',
+   conds:['rhombus','side5','total'],pool:['rhombus','side5','total','par1'],ins:{value:20},
+   answer:{name:'20cm',reason:'마름모는 네 변의 길이가 모두 같아요. 5 + 5 + 5 + 5 = 5 × 4 = 20',def:'네 변의 길이가 같다는 성질을 알면, 한 변만 알아도 둘레를 구할 수 있어요.'}},
+];
+const LINE_M=[
+  {lv:1,target:'perp',given:Lseg(1,4,9,4),text:'검은 선에 수직인 선(수선)을 그어 보세요.',hint:'검은 선은 옆으로 누워 있어요. 똑바로 서 있는 선을 그어 보세요.'},
+  {lv:1,target:'para',given:Lseg(1,4,9,4),text:'검은 선과 평행한 선(평행선)을 그어 보세요.',hint:'검은 선과 같은 방향으로, 다른 줄에 그어 보세요.'},
+  {lv:2,target:'perp',given:Lseg(2,6,8,3),text:'기울어진 검은 선에 수선을 그어 보세요.',hint:'검은 선은 오른쪽으로 2칸 갈 때 위로 1칸 올라가요. 수선은 오른쪽으로 1칸 갈 때 아래로 2칸 내려가요.'},
+  {lv:2,target:'para',given:Lseg(2,6,8,3),text:'기울어진 검은 선과 평행한 선을 그어 보세요.',hint:'검은 선처럼 오른쪽으로 2칸 갈 때 위로 1칸 올라가는 선을 그어 보세요.'},
+];
+const MORPH_M=[
+  {lv:1,text:'꼭짓점 하나만 옮겨서, 평행한 변이 딱 한 쌍인 사각형을 만들어 보세요.',check:an=>an.par===1,hint:'위쪽 꼭짓점 하나를 옆으로 한 칸 옮겨 보세요.'},
+  {lv:2,text:'평행한 변은 두 쌍, 직각은 하나도 없는 사각형을 만들어 보세요.',check:an=>an.par===2&&an.right===0,hint:'위쪽 꼭짓점 두 개를 같은 쪽으로 똑같이 옮겨 보세요.'},
+  {lv:3,text:'네 변의 길이가 모두 같고, 직각은 없는 사각형을 만들어 보세요.',check:an=>an.allEq&&an.right===0,hint:'가운데 점을 하나 정하고, 왼쪽·오른쪽으로 3칸, 위·아래로 2칸 떨어진 곳에 꼭짓점을 놓아 보세요.'},
+];
+const RH=[[0,2],[3,0],[6,2],[3,4]],PA=[[0,4],[4,4],[6,1],[2,1]],TR=[[0,4],[6,4],[4,1],[1,1]],SQ=[[1,0],[5,0],[5,4],[1,4]],RC=[[0,1],[6,1],[6,4],[0,4]],TR2=[[0,4],[6,4],[5,1],[1,1]],ETC=[[0,3],[5,4],[6,0],[2,1]];
+const QUIZ={
+  1:{title:'그림 보고 고르기',desc:'그림을 보고 알맞은 것을 골라요',qs:[
+    {t:'마름모를 찾아 눌러 보세요.',type:'pic',choices:[TR2,RH,RC,PA],ans:1,hint:'네 변의 길이가 모두 같은 사각형을 찾아요.',expl:'네 변의 길이가 모두 같은 사각형이 마름모예요.'},
+    {t:'검은 선에 수직인 파란 선(수선)을 찾아 눌러 보세요.',type:'lines',given:Lseg(0,2,6,2),choices:[Lseg(3,0,3,4),Lseg(1,4,5,0),Lseg(0,4,6,4)],ans:0,hint:'검은 선과 직각으로 만나는 선을 찾아요.',expl:'두 선이 직각으로 만나면 서로 수직이에요. 파란 선은 검은 선의 수선이에요.'},
+    {t:'평행한 변이 딱 한 쌍인 사각형을 찾아 눌러 보세요.',type:'pic',choices:[SQ,TR,PA,ETC],ans:1,hint:'위와 아래의 변만 평행하고, 양옆의 변은 평행하지 않은 사각형을 찾아요.',expl:'평행한 변이 한 쌍이라도 있는 사각형은 사다리꼴이에요.'},
+  ]},
+  2:{title:'특징 알기',desc:'사각형의 특징을 골라요',qs:[
+    {t:'사다리꼴은 (    )이 한 쌍이라도 있는 사각형이에요. 빈칸에 알맞은 말은?',type:'text',fig:{P:TR},choices:['평행한 변','수직인 변','길이가 같은 변'],ans:0,hint:'위의 변과 아래의 변은 아무리 늘여도 만나지 않아요.',expl:'사다리꼴은 평행한 변이 한 쌍이라도 있는 사각형이에요.'},
+    {t:'마름모를 바르게 설명한 것은?',type:'text',fig:{P:RH},choices:['네 변의 길이가 모두 같아요','평행한 변이 딱 한 쌍만 있어요','네 각이 꼭 모두 직각이어야 해요'],ans:0,hint:'마름모의 네 변의 길이를 비교해 보세요.',expl:'마름모는 네 변의 길이가 모두 같은 사각형이에요. 마주 보는 두 쌍의 변은 서로 평행해요.'},
+    {t:'평행사변형에서 마주 보는 두 변의 길이는 어떤가요?',type:'text',fig:{P:PA},choices:['서로 같아요','서로 달라요','알 수 없어요'],ans:0,hint:'위의 변과 아래의 변이 각각 몇 칸인지 세어 보세요.',expl:'평행사변형은 마주 보는 두 변의 길이가 같아요.'},
+  ]},
+  3:{title:'문장제 도전',desc:'특징을 이용해 길이와 넓이를 구해요',qs:[
+    {t:'마름모 모양 표지판의 한 변이 7cm예요. 네 변의 길이를 모두 더하면 몇 cm일까요?',type:'num',unit:'cm',ans:28,fig:{P:RH,labels:['7cm','','',''],grid:false,pad:1.3},hint:'마름모는 네 변의 길이가 모두 같아요. 7을 몇 번 더하면 될까요?',expl:'마름모는 네 변의 길이가 모두 같아서 7 + 7 + 7 + 7 = 7 × 4 = 28(cm)'},
+    {t:'평행사변형 모양 꽃밭의 한 변은 8m, 이웃한 변은 5m예요. 꽃밭의 둘레는 몇 m일까요?',type:'num',unit:'m',ans:26,fig:{P:PA,labels:['8m','5m','',''],grid:false,pad:1.3},hint:'평행사변형은 마주 보는 변의 길이가 같아요. 물음표 변의 길이를 먼저 채워 보세요.',expl:'마주 보는 변의 길이가 같아서 8 + 5 + 8 + 5 = 26(m)'},
+    {t:'정사각형 타일의 한 변이 6cm예요. 타일의 넓이는 몇 cm²일까요?',type:'num',unit:'cm²',ans:36,fig:{P:[[0,0],[4,0],[4,4],[0,4]],labels:['6cm','','',''],grid:false,pad:1.3},hint:'정사각형은 네 변의 길이가 모두 같아요. 가로와 세로는 각각 몇 cm일까요?',expl:'정사각형은 네 변의 길이가 같아서 가로 6cm, 세로 6cm예요. 6 × 6 = 36(cm²)'},
+  ]},
+};
+const SELF=['😀 잘 알겠어요','🙂 조금 알겠어요','🤔 더 연습할래요'];
+const ROLES=[
+  {k:'read',em:'📜',n:'주문서 담당',d:'주문을 읽고 조건을 찾아 친구들에게 알려 줘요'},
+  {k:'build',em:'✏️',n:'만들기 담당',d:'점판에 선을 긋거나 사각형을 만들어요'},
+  {k:'check',em:'🔍',n:'검사관',d:'삼각자로 검사하고, 이름과 이유를 골라 납품해요'},
+];
+
+/* ---------- 상태 ---------- */
+const ST={
+  t:{tab:'twenty',tw:{asked:[],reveal:false},demo:{marks:true,name:false},table:{rev:{}},shop:{i:0,reveal:false,stars:0,tLeft:120,tEnd:0,run:false}},
+  s:{tab:'lines',lines:{i:0,fb:'',done:{}},morph:{i:0,fb:'',done:{},marks:true},shop:{role:null,i:0,st:{}},quiz:{lv:null}},
+};
+function sst(role){const S=ST.s.shop,k=role+S.i;return S.st[k]||(S.st[k]={});}
+
+/* ---------- 공통 조각 ---------- */
+const topbar=(who,tabs,cur)=>`<header class="top"><a class="brand" href="#">◇ 사각형 공방</a><nav class="tabs">${tabs.map(([k,l])=>`<button class="tab ${k===cur?'on':''}" data-act="tab" data-who="${who}" data-k="${k}">${l}</button>`).join('')}</nav><span class="who">${who==='t'?'🖥️ 선생님':'📱 학생'}</span></header>`;
+const sayBtn=t=>`<button class="say" data-act="say" data-t="${esc(t)}" aria-label="읽어 주기">🔊</button>`;
+const legendHTML=()=>`<div class="legend"><span><i class="lg r"></i>직각(수직)</span><span><i class="lg b"></i>평행한 변</span><span><i class="lg o"></i>길이가 같은 변</span></div>`;
+const condChip=k=>`<span class="chip"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</span>`;
+const keypad=ctx=>`<div class="keypad">${['1','2','3','4','5','6','7','8','9','del','0'].map(v=>`<button data-act="kp" data-ctx="${ctx}" data-v="${v}">${v==='del'?'⌫':v}</button>`).join('')}</div>`;
+const missionTabs=(act,list,S)=>`<div class="mission-tabs">${list.map((m,i)=>`<button class="mt ${i===S.i?'on':''} ${S.done[i]?'done':''}" data-act="${act}" data-i="${i}">문제 ${i+1} <span class="st-s">${'★'.repeat(m.lv)}</span></button>`).join('')}</div>`;
+function infoHTML(b,showName){
+  const an=b.an;if(!an.ok)return `<div class="fb tip">⚠️ ${an.msg}</div>`;
+  const fam=FAMILY[an.name];
+  return `<div class="info"><div class="badge par">∥ 평행한 변 <b>${an.par}쌍</b></div><div class="badge perp">⊥ 직각 <b>${an.right}개</b></div><div class="badge eq">＝ ${lenText(an)}</div>${showName?`<div class="name-box">${an.name}${fam.length?`<small>${fam.join('·')}이기도 해요</small>`:''}</div>`:''}</div>`;
+}
+function lineFeedback(kind,target){
+  if(kind===target)return target==='perp'?`<div class="fb ok">🎉 두 선이 직각으로 만나요! 파란 선은 검은 선의 <b>수선</b>이에요.</div>`:`<div class="fb ok">🎉 두 선은 아무리 늘여도 만나지 않아요! 두 선은 <b>평행선</b>이에요.</div>`;
+  if(kind==='perp')return `<div class="fb no">두 선이 직각으로 만나요. 이건 수선이에요! 이번에는 <b>만나지 않는 선(평행선)</b>을 그어 볼까요?</div>`;
+  if(kind==='para')return `<div class="fb no">두 선이 만나지 않아요. 이건 평행선이에요! 이번에는 <b>직각으로 만나는 선(수선)</b>을 그어 볼까요?</div>`;
+  if(kind==='same')return `<div class="fb tip">검은 선과 겹쳐요. 다른 곳에 그어 보세요.</div>`;
+  if(kind==='none')return `<div class="fb tip">점 두 개를 눌러 선을 먼저 그어 보세요.</div>`;
+  return `<div class="fb no">두 선이 비스듬히 만나요. 직각도 아니고 평행도 아니에요. 다시 그어 볼까요?</div>`;
+}
+
+/* ---------- 첫 화면 ---------- */
+function homeView(){
+  return `<div class="home-card"><div class="kicker">중학교 특수학급 · 수학</div><h1>사각형 공방</h1><p class="lead">수직과 평행으로 여러 가지 사각형의 특징을 찾아요</p>
+  <div class="home-btns"><a class="big" href="#t">🖥️ 선생님 화면<small>교실 화면에 띄워요</small></a><a class="big" href="#s">📱 학생 화면<small>아이패드에서 열어요</small></a></div></div>`;
+}
+
+/* ---------- 선생님 화면 ---------- */
+function teacherView(){
+  const T=ST.t,tabs=[['twenty','① 비밀 사각형'],['demo','② 변신 사각형'],['table','③ 특징 표'],['shop','④ 사각형 공방']];
+  return topbar('t',tabs,T.tab)+({twenty:tTwenty,demo:tDemo,table:tTable,shop:tShop}[T.tab])();
+}
+function tTwenty(){
+  const S=ST.t.tw,secret=CANDS.find(c=>c.secret);
+  const out=c=>S.asked.some(k=>c.p[k]!==secret.p[k]);
+  const remain=CANDS.filter(c=>!out(c)),done=remain.length===1;
+  return `<main class="wrap"><h1>비밀 도형을 찾아라!</h1><p class="lead">선생님 마음속 비밀 도형은 무엇일까요? 질문 카드를 골라 물어보세요. <b>질문은 3번까지!</b></p>
+  <div class="cands">${CANDS.map(c=>`<div class="cand ${out(c)?'out':''} ${done&&!out(c)?'win':''}"><svg viewBox="0 0 100 100" class="cand-svg">${c.svg}</svg><div class="cand-l">${c.label}</div></div>`).join('')}</div>
+  <div class="tqs">${TQ.map(q=>{const used=S.asked.includes(q.k);return `<button class="tq ${used?'used':''}" data-act="twAsk" data-k="${q.k}" ${used||done?'disabled':''}><span>${q.q}</span>${used?'<span class="tq-a">네!</span>':''}</button>`;}).join('')}</div>
+  <div class="tw-status">${done?'🎉 비밀 도형은 <b>정사각형</b>이에요!':`남은 도형 ${remain.length}개 · 질문 ${S.asked.length}번`}</div>
+  <div class="row center">${done&&!S.reveal?'<button class="btn acc big" data-act="twReveal">정사각형의 비밀 보기 →</button>':''}<button class="btn ghost" data-act="twReset">처음부터</button></div>
+  ${S.reveal?secretPanel():''}</main>`;
+}
+function secretPanel(){
+  const P=pts([[0,0],[4,0],[4,4],[0,4]]);
+  return `<section class="secret"><div class="secret-fig"><svg viewBox="-1.9 -1.1 7.8 6.2"><line x1="-1.8" y1="0" x2="5.8" y2="0" class="ext"/><line x1="-1.8" y1="4" x2="5.8" y2="4" class="ext"/>${quadSVG(P,analyze(P),{marks:true})}</svg></div>
+  <div><div class="sec-item s1"><span class="dot red"></span><div><b>직각으로 만나는 두 변</b><br>두 직선이 만나서 직각을 이루면 서로 <b class="red">수직</b>이에요.<br>한 직선에 수직인 직선을 <b class="red">수선</b>이라고 해요.</div></div>
+  <div class="sec-item s2"><span class="dot blue"></span><div><b>아무리 늘여도 만나지 않는 두 변</b><br>서로 만나지 않는 두 직선은 <b class="blue">평행</b>해요.<br>평행한 두 직선을 <b class="blue">평행선</b>이라고 해요.</div></div>
+  <div class="goal s3">🎯 <b>오늘의 목표</b><br>수직과 평행을 알고, 사다리꼴·평행사변형·마름모의 특징을 말할 수 있어요.</div>
+  <div class="teaser s4">정사각형에서 조건을 하나씩 빼면 어떤 사각형이 될까요? <b>???</b>의 이름도 오늘 알게 돼요!</div></div></section>`;
+}
+function tDemo(){
+  const D=ST.t.demo;
+  const b=board('tdemo',()=>new Board({P:PRESET['정사각형'],onChange:bb=>setHTML('tdemo-info',infoHTML(bb,ST.t.demo.name))}));
+  b.showMarks=D.marks;b.render();
+  return `<main class="wrap"><h1>변신 사각형</h1><p class="lead">꼭짓점을 끌어서 모양을 바꿔 보세요. 무엇이 바뀌고, 무엇이 그대로인가요?</p>
+  <div class="grid2"><div class="card board-card" data-board="tdemo"></div>
+  <div><div class="row" style="margin-top:0">${Object.keys(PRESET).map(k=>`<button class="btn ghost sm" data-act="demoPreset" data-k="${k}">${k}</button>`).join('')}</div>
+  <div class="row"><button class="btn ghost" data-act="demoMarks">${D.marks?'표시 숨기기':'표시 보기'}</button><button class="btn acc" data-act="demoName">${D.name?'이름 숨기기':'이름 보기'}</button></div>
+  <div id="tdemo-info">${infoHTML(b,D.name)}</div>${legendHTML()}</div></div></main>`;
+}
+function tTable(){
+  const R=ST.t.table.rev;
+  return `<main class="wrap"><h1>사각형 특징 표</h1><p class="lead">칸을 누르면 답이 보여요. 정사각형에서 조건을 하나씩 빼 보세요.</p>
+  <table class="ftable"><thead><tr><th>사각형</th><th>평행한 변</th><th>변의 길이</th><th>직각</th></tr></thead><tbody>
+  ${TABLE.map((r,i)=>`<tr class="${r.start?'start':''}"><td><div class="nm-in">${figSVG(r.P,{marks:true,grid:false,pad:.5})}<span>${r.n}${r.start?'<small>출발</small>':''}</span></div></td>${r.c.map((c,j)=>{const on=r.start||R[i+'-'+j];return `<td><button class="cell ${on?'rev':''}" data-act="tblCell" data-k="${i}-${j}" ${r.start?'disabled':''}>${on?c:'?'}</button></td>`;}).join('')}</tr>`).join('')}
+  </tbody></table>
+  <div class="row"><button class="btn ghost" data-act="tblAll">모두 보기</button><button class="btn ghost" data-act="tblHide">모두 가리기</button></div>
+  <div class="chain"><span class="c">정사각형</span><span class="arr">'직각' 조건 빼기 →</span><span class="c">마름모</span><span class="arr">'네 변 같음' 조건 빼기 →</span><span class="c">평행사변형</span><span class="arr">평행은 한 쌍만 남기기 →</span><span class="c">사다리꼴</span></div>
+  <p class="sub">그래서 정사각형은 마름모이기도, 평행사변형이기도, 사다리꼴이기도 해요.</p>${legendHTML()}</main>`;
+}
+function tShop(){
+  const S=ST.t.shop,o=ORDERS[S.i];
+  return `<main class="wrap"><div class="shop">
+  <section><div class="card order"><div class="who-em">${o.who}</div><div class="who-name">주문 ${S.i+1} / ${ORDERS.length} · ${o.name}</div><div class="bubble">${o.text}</div></div>${S.reveal?answerHTML(o):''}</section>
+  <section><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="tShopGo" data-i="${i}">${i+1}</button>`).join('')}</div>
+  <div class="row"><button class="btn ghost" data-act="say" data-t="${esc(o.text)}">🔊 주문 읽기</button><button class="btn ghost" data-act="tBell">🔔 손님 왔어요</button></div>
+  <div class="card"><div class="row" style="margin:0"><span class="timer" id="tTimer">${fmt(S.tLeft)}</span><button class="btn ghost" data-act="tTimer">${S.run?'멈춤':'시작'}</button><button class="btn ghost" data-act="tTimerReset">2분으로</button></div></div>
+  <div class="card" style="margin-top:12px"><b>우리 팀 별</b><div class="stars">${'⭐'.repeat(S.stars)||'<span class="sub">아직 없어요</span>'}</div><div class="row" style="margin:6px 0 0"><button class="btn" data-act="tStar" data-d="1">⭐ 주기</button><button class="btn ghost" data-act="tStar" data-d="-1">빼기</button></div></div>
+  <div class="row"><button class="btn acc big" data-act="tReveal">${S.reveal?'정답 숨기기':'정답 공개'}</button></div></section></div></main>`;
+}
+function answerHTML(o){
+  const A=o.answer;let fig;
+  if(o.type==='quad')fig=figSVG(A.P,{marks:true});
+  else if(o.type==='line')fig=figLinesSVG(o.given,A.line,{cols:11,rows:8,mark:o.target});
+  else fig=figSVG(VIP_P,{labels:['5cm','5cm','5cm','5cm'],grid:false,pad:1.2});
+  return `<div class="card ans"><div class="ans-fig">${fig}</div><div class="chips">${o.conds.map(condChip).join('')}</div><div class="name-box" style="margin-top:12px">${A.name}</div><p><b>이유</b> · ${A.reason}</p><p class="sub">${A.def}</p></div>`;
+}
+
+/* ---------- 학생 화면 ---------- */
+function studentView(){
+  const S=ST.s,tabs=[['lines','① 수직·평행'],['morph','② 변신 사각형'],['shop','③ 사각형 공방'],['quiz','④ 확인 문제']];
+  return topbar('s',tabs,S.tab)+({lines:sLines,morph:sMorph,shop:sShop,quiz:sQuiz}[S.tab])();
+}
+function sLines(){
+  const S=ST.s.lines,m=LINE_M[S.i];
+  board('sline',()=>new Board({mode:'line',given:m.given,onChange:()=>{ST.s.lines.fb='';setHTML('sline-fb','');}}));
+  return `<main class="wrap">${missionTabs('lineSel',LINE_M,S)}
+  <div class="mission"><p class="m-text">${m.text}</p>${sayBtn(m.text)}</div>
+  <div class="grid2 gap-top"><div class="card board-card" data-board="sline"></div>
+  <div><p class="sub" style="margin-top:0">점 두 개를 차례로 눌러 파란 선을 그어요. 다시 누르면 새로 그려요.</p>
+  <div class="row"><button class="btn ghost" data-act="lineClear">지우기</button><button class="btn ghost" data-act="lineHint">💡 힌트</button><button class="btn" data-act="lineCheck">확인</button></div>
+  <div id="sline-fb">${S.fb||''}</div></div></div></main>`;
+}
+function sMorph(){
+  const S=ST.s.morph,m=MORPH_M[S.i];
+  const b=board('smorph',()=>new Board({P:PRESET['정사각형'],onChange:bb=>{ST.s.morph.fb='';setHTML('smorph-fb','');if(ST.s.morph.marks)setHTML('smorph-info',infoHTML(bb,false));}}));
+  b.showMarks=S.marks;b.render();
+  return `<main class="wrap">${missionTabs('morphSel',MORPH_M,S)}
+  <div class="mission"><p class="m-text">${m.text}</p>${sayBtn(m.text)}</div>
+  <div class="grid2 gap-top"><div class="card board-card" data-board="smorph"></div>
+  <div><p class="sub" style="margin-top:0">정사각형에서 출발해요. 동그라미 꼭짓점을 끌어서 옮겨요.</p><div id="smorph-info">${S.marks?infoHTML(b,false):''}</div>${S.marks?legendHTML():''}
+  <div class="row"><button class="btn ghost" data-act="morphReset">정사각형으로</button><button class="btn ghost" data-act="morphMarks">${S.marks?'표시 숨기기':'표시 보기'}</button><button class="btn ghost" data-act="morphHint">💡 힌트</button><button class="btn" data-act="morphCheck">확인</button></div>
+  <div id="smorph-fb">${S.fb||''}</div></div></div></main>`;
+}
+function sShop(){
+  const S=ST.s.shop;
+  if(!S.role)return `<main class="wrap"><h1>사각형 공방</h1><p class="lead">오늘 내가 맡을 일을 골라요.</p>
+  <div class="roles">${ROLES.map(r=>`<button class="role" data-act="sRole" data-k="${r.k}"><div class="em">${r.em}</div><b>${r.n}</b><span>${r.d}</span></button>`).join('')}</div></main>`;
+  const r=ROLES.find(x=>x.k===S.role);
+  return `<main class="wrap"><div class="role-bar"><span class="role-tag">${r.em} ${r.n}</span><button class="btn ghost sm" data-act="sRole" data-k="">역할 바꾸기</button></div>
+  <div class="row"><span class="prog">선생님 화면의 주문 번호를 눌러요</span><div class="onum">${ORDERS.map((x,i)=>`<button class="${i===S.i?'on':''}" data-act="sShopGo" data-i="${i}">${i+1}</button>`).join('')}</div></div>
+  ${({read:sRead,build:sBuild,check:sCheck}[S.role])()}</main>`;
+}
+function sRead(){
+  const o=ORDERS[ST.s.shop.i],st=sst('read');st.hl=st.hl||{};st.sel=st.sel||{};
+  const words=o.text.split(' ');
+  return `<div class="mission"><div class="who-sm">${o.who}</div><div class="words">${words.map((w,j)=>`<button class="w ${st.hl[j]?'hl':''}" data-act="wHl" data-j="${j}">${w}</button>`).join(' ')}</div>${sayBtn(o.text)}</div>
+  <p class="sub">조건이 되는 말을 눌러 밑줄을 그어요.</p>
+  <div class="qblock"><h3>이 주문의 조건을 모두 골라요</h3><div class="pool">${o.pool.map(k=>{let c='';
+    if(st.checked){const need=o.conds.includes(k),sel=!!st.sel[k];c=need&&sel?'good':need?'miss':sel?'bad':'';}else if(st.sel[k])c='sel';
+    return `<button class="pchip ${c}" data-act="rSel" data-k="${k}">${COND[k][1]}</button>`;}).join('')}</div>
+  <div class="row"><button class="btn" data-act="rCheck">확인</button></div>${st.fb||''}</div>`;
+}
+function makeBuildBoard(o){
+  const clear=bb=>{const st=sst('build');st.fb='';setHTML('build-fb','');if(bb.mode==='quad'&&bb.showMarks){bb.showMarks=false;bb.render();}};
+  if(o.type==='quad')return new Board({P:PRESET['정사각형'],showMarks:false,onChange:clear});
+  if(o.type==='line')return new Board({mode:'line',given:o.given,onChange:clear});
+  return new Board({mode:'label',P:VIP_P,labels:['5cm','','',''],fixed:[true,false,false,false],val:'5cm',onChange:clear});
+}
+function sBuild(){
+  const i=ST.s.shop.i,o=ORDERS[i],st=sst('build');st.memo=st.memo||{};
+  board('build'+i,()=>makeBuildBoard(o));
+  const guide={line:'점 두 개를 차례로 눌러 파란 선을 그어요.',quad:'동그라미 꼭짓점을 끌어서 사각형을 만들어요.',vip:"물음표(?) 변을 눌러 길이를 채워요. 그림의 한 칸은 1cm예요."}[o.type];
+  return `<div class="grid2"><div class="card board-card" data-board="build${i}"></div>
+  <div><div class="qblock" style="margin-top:0"><h3>📜 주문서 담당이 말해 준 조건을 눌러 두세요</h3><div class="pool">${o.pool.map(k=>`<button class="pchip ${st.memo[k]?'sel':''}" data-act="bMemo" data-k="${k}"><span class="ic">${COND[k][0]}</span>${COND[k][1]}</button>`).join('')}</div></div>
+  <p class="sub">${guide}</p>
+  <div class="row">${o.type!=='vip'?'<button class="btn ghost" data-act="bReset">처음으로</button>':''}${o.hint?'<button class="btn ghost" data-act="bHint">💡 힌트</button>':''}<button class="btn" data-act="bCheck">검사하기</button></div>
+  <div id="build-fb">${st.fb||''}</div></div></div>`;
+}
+function sCheck(){
+  const o=ORDERS[ST.s.shop.i],st=sst('check');st.a=st.a||{};
+  const opt=(q,title,list)=>`<div class="qblock"><h3>${title}</h3><div class="opts">${list.map(v=>`<button class="opt ${st.a[q]===v?'sel':''}" data-act="cOpt" data-q="${q}" data-v="${esc(v)}">${v}</button>`).join('')}</div></div>`;
+  let h='',need;
+  if(o.type==='quad'){
+    h+='<p class="sub">📐 만들기 담당의 그림을 보고, 삼각자로 직각을 재어 봐요. 마주 보는 변이 평행한지도 살펴봐요.</p>';
+    h+=opt('par','① 평행한 변은 몇 쌍인가요?',['0쌍','1쌍','2쌍'])+opt('rt','② 직각은 몇 개인가요?',['0개','1개','2개','3개','4개'])+opt('eq','③ 네 변의 길이가 모두 같나요?',['네','아니요'])
+      +opt('name','④ 이 사각형의 이름은?',['사다리꼴','평행사변형','마름모','직사각형','정사각형'])+opt('rs','⑤ 이유 카드를 골라요',[REASON.r1,REASON.r2,REASON.r3,REASON.r4]);
+    need=['par','rt','eq','name','rs'];
+  }else if(o.type==='line'){
+    h+='<p class="sub">📐 만들기 담당이 그은 선을 보고, 삼각자로 재어 봐요.</p>';
+    h+=opt('meet','① 두 선은 어떻게 만나나요?',['직각으로 만나요','비스듬히 만나요','만나지 않아요'])+opt('name','② 파란 선의 이름은?',['수선','평행선'])+opt('rs','③ 이유 카드를 골라요',[REASON.l1,REASON.l2]);
+    need=['meet','name','rs'];
+  }else{
+    h+=opt('eq','① 마름모의 네 변의 길이는?',['모두 같아요','모두 달라요']);
+    h+=`<div class="qblock"><h3>② 테두리는 모두 몇 cm 필요할까요?</h3><div class="numline"><span class="numbox">${st.num||'&nbsp;'}</span>cm</div>${keypad('check')}</div>`;
+    need=['eq'];
+  }
+  const ready=need.every(q=>st.a[q])&&(o.type!=='vip'||st.num);
+  return h+`<div class="row"><button class="btn big" data-act="cSubmit" ${ready?'':'disabled'}>📦 납품하기</button></div><div id="check-fb">${st.fb||''}</div>`;
+}
+function sQuiz(){
+  const Q=ST.s.quiz;
+  if(!Q.lv)return `<main class="wrap"><h1>확인 문제</h1><p class="lead">내가 풀 단계를 골라요. 다 풀면 다른 단계도 도전할 수 있어요.</p>
+  <div class="levels">${[1,2,3].map(l=>`<button class="lvl" data-act="qLv" data-l="${l}"><div class="st">${'★'.repeat(l)}</div><b>${QUIZ[l].title}</b><span>${QUIZ[l].desc}</span></button>`).join('')}</div></main>`;
+  const set=QUIZ[Q.lv];
+  if(Q.fin){const n=Q.first.filter(Boolean).length;
+    return `<main class="wrap"><div class="card fin"><div class="big-st">${'★'.repeat(Q.lv)}</div><h1>${set.title} 끝!</h1><p class="lead">${set.qs.length}문제 중 <b>${n}문제</b>를 한 번에 맞혔어요.</p>
+    <div class="qblock"><h3>오늘 수업, 나는?</h3><div class="opts">${SELF.map(s=>`<button class="opt ${Q.self===s?'sel':''}" data-act="qSelf" data-v="${s}">${s}</button>`).join('')}</div>${Q.self?'<div class="fb ok">좋아요! 선생님께 화면을 보여 주세요.</div>':''}</div>
+    <div class="row center"><button class="btn" data-act="qBack">다른 단계 풀기</button></div></div></main>`;}
+  const q=set.qs[Q.i],cls=j=>Q.sel!==j?'':Q.ok?'sel-ok':'sel-no';
+  let choices;
+  if(q.type==='pic')choices=`<div class="picgrid">${q.choices.map((P,j)=>`<button class="pic ${cls(j)}" data-act="qPick" data-i="${j}">${figSVG(P,{box:[-.6,-.6,7.2,5.2]})}</button>`).join('')}</div>`;
+  else if(q.type==='lines')choices=`<div class="picgrid three">${q.choices.map((l,j)=>`<button class="pic ${cls(j)}" data-act="qPick" data-i="${j}">${figLinesSVG(q.given,l)}</button>`).join('')}</div>`;
+  else if(q.type==='text')choices=`<div class="opts col">${q.choices.map((t,j)=>`<button class="opt ${cls(j)}" data-act="qPick" data-i="${j}">${t}</button>`).join('')}</div>`;
+  else choices=`<div class="numline"><span class="numbox">${Q.num||'&nbsp;'}</span>${q.unit}</div><div class="kp-wrap">${keypad('quiz')}<button class="btn big" data-act="qNum">확인</button></div>`;
+  const fig=q.fig?`<div class="qfig">${figSVG(q.fig.P,q.fig)}</div>`:'';
+  let fb='';
+  if(Q.ok)fb=`<div class="fb ok">⭕ 정답! ${q.expl}</div><div class="row"><button class="btn big" data-act="qNext">${Q.i+1<set.qs.length?'다음 문제 →':'결과 보기 →'}</button></div>`;
+  else if(Q.wrong)fb='<div class="fb no">다시 생각해 봐요.</div>';
+  const hint=!Q.ok&&Q.hint?`<div class="fb tip">💡 ${q.hint}</div>`:'';
+  return `<main class="wrap"><div class="row" style="margin-top:0"><span class="prog">${'★'.repeat(Q.lv)} ${set.title} · ${Q.i+1} / ${set.qs.length}</span><button class="btn ghost sm" data-act="qBack" style="margin-left:auto">단계 고르기</button></div>
+  <div class="mission"><p class="m-text">${q.t}</p>${sayBtn(q.t)}</div>${fig}${choices}
+  ${!Q.ok&&!Q.hint?'<div class="row"><button class="btn ghost" data-act="qHint">💡 힌트</button></div>':''}${hint}${fb}</main>`;
+}
+function judge(Q,ok){
+  if(ok){Q.ok=true;Q.first[Q.i]=Q.wrong===0;ding('ok');}
+  else{Q.wrong++;Q.hint=true;Q.num='';ding('no');}
+  render();
+}
+
+/* ---------- 버튼 동작 ---------- */
+const ACT={
+  tab(el){ST[el.dataset.who].tab=el.dataset.k;render();scrollTo(0,0);},
+  say(el){speak(el.dataset.t);},
+  twAsk(el){const T=ST.t.tw;if(!T.asked.includes(el.dataset.k))T.asked.push(el.dataset.k);ding('ok');render();},
+  twReveal(){ST.t.tw.reveal=true;ding('bell');render();},
+  twReset(){ST.t.tw={asked:[],reveal:false};render();},
+  demoPreset(el){BOARDS.tdemo.P=clone(PRESET[el.dataset.k]);render();},
+  demoMarks(){ST.t.demo.marks=!ST.t.demo.marks;render();},
+  demoName(){ST.t.demo.name=!ST.t.demo.name;render();},
+  tblCell(el){const R=ST.t.table.rev,k=el.dataset.k;R[k]=!R[k];render();},
+  tblAll(){TABLE.forEach((r,i)=>r.c.forEach((_,j)=>{ST.t.table.rev[i+'-'+j]=true;}));render();},
+  tblHide(){ST.t.table.rev={};render();},
+  tShopGo(el){const S=ST.t.shop;S.i=+el.dataset.i;S.reveal=false;ding('bell');render();},
+  tBell(){ding('bell');},
+  tTimer(){const S=ST.t.shop;if(S.run)S.run=false;else{if(S.tLeft<=0)S.tLeft=120;S.tEnd=Date.now()+S.tLeft*1000;S.run=true;}render();},
+  tTimerReset(){const S=ST.t.shop;S.run=false;S.tLeft=120;render();},
+  tStar(el){const S=ST.t.shop,d=+el.dataset.d;S.stars=Math.max(0,S.stars+d);if(d>0)ding('ok');render();},
+  tReveal(){const S=ST.t.shop;S.reveal=!S.reveal;if(S.reveal)ding('ok');render();},
+  lineSel(el){const S=ST.s.lines;S.i=+el.dataset.i;S.fb='';delete BOARDS.sline;render();},
+  lineClear(){const b=BOARDS.sline;b.ua=b.ub=null;b.checked=false;b.render();ST.s.lines.fb='';setHTML('sline-fb','');},
+  lineHint(){const S=ST.s.lines;S.fb=`<div class="fb tip">💡 ${LINE_M[S.i].hint}</div>`;setHTML('sline-fb',S.fb);},
+  lineCheck(){const S=ST.s.lines,m=LINE_M[S.i],b=BOARDS.sline,r=lineCheck(m.given,b.ua,b.ub);
+    b.checked=r.kind==='perp'||r.kind==='para';b.render();S.fb=lineFeedback(r.kind,m.target);
+    if(r.kind===m.target){S.done[S.i]=true;ding('ok');}else ding('no');render();},
+  morphSel(el){const S=ST.s.morph;S.i=+el.dataset.i;S.fb='';if(BOARDS.smorph)BOARDS.smorph.P=clone(PRESET['정사각형']);render();},
+  morphReset(){BOARDS.smorph.P=clone(PRESET['정사각형']);ST.s.morph.fb='';render();},
+  morphMarks(){ST.s.morph.marks=!ST.s.morph.marks;render();},
+  morphHint(){const S=ST.s.morph;S.fb=`<div class="fb tip">💡 ${MORPH_M[S.i].hint}</div>`;render();},
+  morphCheck(){const S=ST.s.morph,m=MORPH_M[S.i],an=BOARDS.smorph.an;
+    if(!an.ok){S.fb=`<div class="fb tip">⚠️ ${an.msg}</div>`;ding('no');}
+    else if(m.check(an)){S.done[S.i]=true;ding('ok');const fam=FAMILY[an.name];
+      S.fb=(S.i===1&&an.name==='마름모')?'<div class="fb ok">🎉 성공! 마름모가 됐네요. 마름모도 마주 보는 두 쌍의 변이 평행해서 <b>평행사변형</b>이에요.</div>'
+        :`<div class="fb ok">🎉 성공! 이 사각형의 이름은 <b>${josa(an.name,'이에요','예요')}</b>.${fam.length?`<br><span class="sub">${fam.join('·')}이기도 해요.</span>`:''}</div>`;}
+    else{S.fb=`<div class="fb no">아직이에요. 지금은 평행한 변 ${an.par}쌍, 직각 ${an.right}개예요. ${lenText(an)}.</div>`;ding('no');}
+    render();},
+  sShopGo(el){ST.s.shop.i=+el.dataset.i;render();},
+  sRole(el){ST.s.shop.role=el.dataset.k||null;render();scrollTo(0,0);},
+  wHl(el){const st=sst('read');st.hl[el.dataset.j]=!st.hl[el.dataset.j];el.classList.toggle('hl');},
+  rSel(el){const st=sst('read');st.sel[el.dataset.k]=!st.sel[el.dataset.k];st.checked=false;st.fb='';render();},
+  rCheck(){const o=ORDERS[ST.s.shop.i],st=sst('read'),sel=Object.keys(st.sel).filter(k=>st.sel[k]);
+    const ok=sel.length===o.conds.length&&o.conds.every(k=>st.sel[k]);st.checked=true;
+    st.fb=ok?'<div class="fb ok">🎉 맞아요! 만들기 담당에게 조건을 또박또박 말해 주세요.</div>':'<div class="fb no">초록은 맞은 조건, 점선은 빠진 조건, 빨강은 주문에 없는 조건이에요. 다시 골라 봐요.</div>';
+    ding(ok?'ok':'no');render();},
+  bMemo(el){const st=sst('build');st.memo[el.dataset.k]=!st.memo[el.dataset.k];el.classList.toggle('sel');},
+  bReset(){delete BOARDS['build'+ST.s.shop.i];sst('build').fb='';render();},
+  bHint(){const st=sst('build');st.fb=`<div class="fb tip">💡 ${ORDERS[ST.s.shop.i].hint}</div>`;setHTML('build-fb',st.fb);},
+  bCheck(){
+    const i=ST.s.shop.i,o=ORDERS[i],b=BOARDS['build'+i],st=sst('build');let ok=false,html;
+    if(o.type==='quad'){const an=b.an;
+      if(!an.ok)html=`<div class="fb tip">⚠️ ${an.msg}</div>`;
+      else{b.showMarks=true;b.render();ok=o.conds.every(k=>CEVAL[k](an));
+        html=`<div class="fb ${ok?'ok':'no'}">${ok?'🎉 주문대로 만들었어요! 검사관에게 보여 주세요.':'아직 주문과 달라요. 다시 고쳐 볼까요?'}<ul class="checks">${o.conds.map(k=>`<li>${CEVAL[k](an)?'✅':'❌'} ${COND[k][1]}</li>`).join('')}</ul><div class="sub">지금: 평행한 변 ${an.par}쌍 · 직각 ${an.right}개 · ${lenText(an)}</div></div>`;}}
+    else if(o.type==='line'){const r=lineCheck(o.given,b.ua,b.ub);b.checked=r.kind==='perp'||r.kind==='para';b.render();ok=r.kind===o.target;html=lineFeedback(r.kind,o.target);}
+    else{ok=b.labels.every(Boolean);html=ok?'<div class="fb ok">🎉 네 변이 모두 5cm예요! 검사관이 테두리 길이를 계산해요.</div>':"<div class=\"fb no\">아직 '?'인 변이 있어요. 마름모는 네 변의 길이가 어떤가요?</div>";}
+    ding(ok?'ok':'no');st.fb=html;setHTML('build-fb',html);},
+  cOpt(el){const st=sst('check');st.a[el.dataset.q]=el.dataset.v;st.fb='';render();},
+  kp(el){const ctx=el.dataset.ctx,v=el.dataset.v,obj=ctx==='check'?sst('check'):ST.s.quiz;let n=obj.num||'';
+    if(v==='del')n=n.slice(0,-1);else if(n.length<3)n+=v;obj.num=n;if(ctx==='check')obj.fb='';render();},
+  cSubmit(){
+    const o=ORDERS[ST.s.shop.i],st=sst('check'),I=o.ins;let ok,msg;
+    if(o.type==='quad'){const nOk=I.accept.includes(st.a.name),rOk=st.a.rs===REASON[I.reason];ok=nOk&&rOk;
+      msg=ok?(st.a.name!==I.name?`🎉 납품 성공! ${josa(st.a.name,'은','는')} 마주 보는 두 쌍의 변이 평행해서 ${I.name}이기도 해요.`:'🎉 납품 성공! 손을 들어 선생님께 알려요.')
+        :(!nOk?'이름을 다시 생각해 봐요. 평행한 변이 몇 쌍인지, 네 변의 길이가 같은지 살펴봐요.':'이름은 맞았어요! 이유 카드를 다시 골라 봐요.');}
+    else if(o.type==='line'){const mOk=st.a.meet===I.meet,nOk=st.a.name===I.name,rOk=st.a.rs===REASON[I.reason];ok=mOk&&nOk&&rOk;
+      msg=ok?'🎉 납품 성공! 손을 들어 선생님께 알려요.':!mOk?'두 선이 어떻게 만나는지 다시 살펴봐요.':!nOk?'선의 이름을 다시 생각해 봐요.':'이유 카드를 다시 골라 봐요.';}
+    else{const eOk=st.a.eq==='모두 같아요',vOk=+st.num===I.value;ok=eOk&&vOk;
+      msg=ok?'🎉 VIP 납품 성공! 5 + 5 + 5 + 5 = 20, 금테는 20cm예요.':!eOk?'마름모의 네 변의 길이를 다시 생각해 봐요.':'다시 계산해 봐요. 5cm인 변이 몇 개 있나요?';}
+    ding(ok?'ok':'no');st.fb=`<div class="fb ${ok?'ok':'no'}">${msg}</div>`;render();},
+  qLv(el){ST.s.quiz={lv:+el.dataset.l,i:0,first:[],wrong:0,sel:null,ok:false,num:'',fin:false,self:null,hint:false};render();scrollTo(0,0);},
+  qPick(el){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok)return;const v=+el.dataset.i;Q.sel=v;judge(Q,v===q.ans);},
+  qNum(){const Q=ST.s.quiz,q=QUIZ[Q.lv].qs[Q.i];if(Q.ok||!Q.num)return;judge(Q,+Q.num===q.ans);},
+  qHint(){ST.s.quiz.hint=true;render();},
+  qNext(){const Q=ST.s.quiz;Q.i++;Object.assign(Q,{wrong:0,sel:null,ok:false,num:'',hint:false});if(Q.i>=QUIZ[Q.lv].qs.length)Q.fin=true;render();scrollTo(0,0);},
+  qSelf(el){ST.s.quiz.self=el.dataset.v;render();},
+  qBack(){ST.s.quiz={lv:null};render();scrollTo(0,0);},
+};
+
+/* ---------- 그리기 시작 ---------- */
+function render(){
+  const r=location.hash.slice(1);
+  document.body.className=r==='t'?'teacher':r==='s'?'student':'home';
+  $('#app').innerHTML=r==='t'?teacherView():r==='s'?studentView():homeView();
+  document.querySelectorAll('[data-board]').forEach(s=>{const b=BOARDS[s.dataset.board];if(b)s.appendChild(b.svg);});
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const fn=ACT[el.dataset.act];if(fn)fn(el,e);});
+window.addEventListener('hashchange',()=>{render();scrollTo(0,0);});
+setInterval(()=>{const S=ST.t.shop;if(!S.run)return;S.tLeft=Math.max(0,Math.ceil((S.tEnd-Date.now())/1000));const el=document.getElementById('tTimer');if(el)el.textContent=fmt(S.tLeft);
+  if(S.tLeft===0){S.run=false;ding('bell');if(location.hash==='#t'&&ST.t.tab==='shop')render();}},250);
+render();
+</script>
+</body>
+</html>
